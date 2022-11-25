@@ -1,0 +1,10 @@
+{
+  "name": "Pipit",
+  "out": "./docs",
+  "includeVersion": true,
+  "cleanOutputDir": true,
+  "entryPoints": [
+    "./packages/*"
+  ],
+  "entryPointStrategy": "packages"
+}
