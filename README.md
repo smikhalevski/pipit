@@ -1,4 +1,4 @@
-# Pipit&ensp;🐦&ensp;[![build](https://github.com/smikhalevski/pipit/actions/workflows/master.yml/badge.svg?branch=master&event=push)](https://github.com/smikhalevski/pipit/actions/workflows/master.yml)
+# Pipit&ensp;🪶&ensp;[![build](https://github.com/smikhalevski/pipit/actions/workflows/master.yml/badge.svg?branch=master&event=push)](https://github.com/smikhalevski/pipit/actions/workflows/master.yml)
 
 Universal logger with pluggable architecture.
 
