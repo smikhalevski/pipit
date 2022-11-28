@@ -6,7 +6,7 @@
 </a>
 </p>
 
-Universal logger with pluggable architecture.
+The universal logger with the pluggable architecture.
 
 ```sh
 npm install --save-prod pipit

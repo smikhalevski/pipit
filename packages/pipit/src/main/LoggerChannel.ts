@@ -29,7 +29,7 @@ export type LogProcessor = (messages: LogMessage[], next: (messages: LogMessage[
 /**
  * Dispatches a logged message.
  */
-export interface LogMessageDispatcher {
+export interface LogDispatcher {
   /**
    * @param level The message severity level.
    * @param args The array of arguments.
@@ -41,7 +41,7 @@ export interface LogMessageDispatcher {
 /**
  * The channel manages the sequence of processors.
  */
-export class LoggerChannel implements LogMessageDispatcher {
+export class LoggerChannel implements LogDispatcher {
   /**
    * The list of processors in this channel.
    */
@@ -53,7 +53,7 @@ export class LoggerChannel implements LogMessageDispatcher {
    * @param processor The processor to append.
    * @return This channel instance.
    */
-  to(processor: LogProcessor | LogMessageDispatcher): this {
+  to(processor: LogProcessor | LogDispatcher): this {
     if (typeof processor === 'object') {
       const dispatcher = processor;
 

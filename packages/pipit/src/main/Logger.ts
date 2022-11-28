@@ -1,10 +1,10 @@
 import { LogLevel } from './LogLevel';
-import { LoggerChannel, LogMessageDispatcher } from './LoggerChannel';
+import { LogDispatcher, LoggerChannel } from './LoggerChannel';
 
 /**
  * Dispatches logged messages to channels.
  */
-export class Logger implements LogMessageDispatcher {
+export class Logger implements LogDispatcher {
   /**
    * The list of channels.
    */
