@@ -222,10 +222,10 @@ Prepends a set args to each message.
 ```ts
 myLogger
   .openChannel()
-  .to(prepend('Boss'))
+  .to(prepend('Hello,'))
   .to(printToConsole());
 
-myLogger.log('Hello,');
+myLogger.log('Boss');
 // → 'Hello, Boss'
 ```
 
