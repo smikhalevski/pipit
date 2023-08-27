@@ -1,9 +1,7 @@
-<p>
-<a href="#readme">
-
-![Pipit](./images/pipit.png)
-
-</a>
+<p align="center">
+  <a href="#readme">
+    <img src="./images/pipit.png" alt="Pipit">
+  </a>
 </p>
 
 The universal logger with the pluggable architecture.
@@ -46,7 +44,7 @@ import { Logger, printToConsole } from 'pipit';
 
 const myLogger = new Logger();
 
-// Open a channel that prints a message to a console
+// Open a channel that prints a message to the console
 myLogger.openChannel().to(printToConsole());
 
 myLogger.log('Oh, snap!');
@@ -132,7 +130,7 @@ logger.reset(LogLevel.WARN);
 
 ## Processors
 
-Logger channels are sequences of processors. Processor is callback that receives an array of messages and performs
+Logger channels are sequences of processors. Processor is a callback that receives an array of messages and performs
 arbitrary operations on those messages. When processor has completed its job, it can pass messages to the next processor
 in the channel.
 
@@ -157,7 +155,7 @@ myLogger
   .to(printToConsole());
 
 myLogger.log('Okay, cowboy');
-// → '2022-11-25T16:59:44.286Z Okay, cowboy'
+// ⮕ '2022-11-25T16:59:44.286Z Okay, cowboy'
 ```
 
 You can use a logger or a channel as a processor:
@@ -185,12 +183,12 @@ myLogger.log('No way');
 // Does nothing, since not enough messages to dispatch
 
 myLogger.log('Yay');
-// → 'No way'
-// → 'Yay'
+// ⮕ 'No way'
+// ⮕ 'Yay'
 ```
 
 By default, at most 50 messages are batched in the 1s timeframe. You can provide both the `timeout` and
-`limit` options at the same time and when any of constraints is hit, then batched messages are sent to the next
+`limit` options at the same time and when any constraint is hit, then batched messages are sent to the next
 processor.
 
 ## `levelCutoff`
@@ -226,7 +224,7 @@ myLogger
   .to(printToConsole());
 
 myLogger.log('Boss');
-// → 'Hello, Boss'
+// ⮕ 'Hello, Boss'
 ```
 
 ## `prependDateTime`
@@ -240,7 +238,7 @@ myLogger
   .to(printToConsole());
 
 myLogger.log('Okay, cowboy');
-// → '2022-11-25T16:59:44.286Z Okay, cowboy'
+// ⮕ '2022-11-25T16:59:44.286Z Okay, cowboy'
 ```
 
 ## `prependLevel`
@@ -254,7 +252,7 @@ myLogger
   .to(printToConsole());
 
 myLogger.fatal('No way!');
-// → 'FATAL No way
+// ⮕ 'FATAL No way
 ```
 
 ## `printToConsole`
@@ -265,7 +263,7 @@ Prints messages to the console.
 myLogger.openChannel().to(printToConsole());
 
 myLogger.log('Okay');
-// → 'Okay'
+// ⮕ 'Okay'
 ```
 
 ## `sendToSentry`
