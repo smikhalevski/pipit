@@ -4,7 +4,8 @@ import { Client } from '@sentry/types';
 /**
  * Sends messages to [Sentry](https://sentry.io).
  *
- * Messages with level greater or equal to `LogLevel.ERROR` are sent as exceptions. Others are sent as regular messages.
+ * Messages with level greater or equal to {@link LogLevel.ERROR} are sent as exceptions. Others are sent as regular
+ * messages.
  *
  * @param client The Sentry client.
  * @returns The processor callback.

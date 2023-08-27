@@ -67,7 +67,7 @@ describe('LoggerChannel', () => {
 
   test('a processor can invoke the next processor', () => {
     const channel = new LoggerChannel();
-    const processorMock1 = jest.fn((messages, next) => next([{ level: 111, args: ['bbb'], context: 222 }]));
+    const processorMock1 = jest.fn((_messages, next) => next([{ level: 111, args: ['bbb'], context: 222 }]));
     const processorMock2 = jest.fn();
 
     channel.to(processorMock1).to(processorMock2);

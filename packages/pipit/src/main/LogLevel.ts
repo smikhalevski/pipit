@@ -1,6 +1,6 @@
 export enum LogLevel {
   /**
-   * Designates finer-grained informational events than the {@linkcode DEBUG}, usually with a stack trace.
+   * Designates finer-grained informational events than the {@link DEBUG}, usually with a stack trace.
    */
   TRACE = 100,
 

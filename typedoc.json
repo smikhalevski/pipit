@@ -1,10 +1,16 @@
 {
   "name": "Pipit",
-  "out": "./docs",
   "includeVersion": true,
-  "cleanOutputDir": true,
+  "excludePrivate": true,
+  "excludeExternals": true,
+  "excludeInternal": true,
+  "disableSources": true,
+  "hideGenerator": true,
+  "readme": "none",
+  "tsconfig": "./tsconfig.build.json",
+  "customCss": "./node_modules/typedoc-custom-css/custom.css",
   "entryPoints": [
-    "./packages/*"
-  ],
-  "entryPointStrategy": "packages"
+    "./packages/pipit/src/main/index.ts",
+    "./packages/sentry/src/main/index.ts"
+  ]
 }
