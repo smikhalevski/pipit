@@ -1,7 +1,7 @@
 import { LogMessage, LogProcessor } from '../LoggerChannel';
 
 /**
- * Options passed to {@linkcode batchMessages}.
+ * Options passed to {@link batchMessages}.
  */
 export interface BatchOptions {
   /**

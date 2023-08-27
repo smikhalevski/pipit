@@ -2,23 +2,27 @@
   "name": "pipit",
   "version": "1.0.0",
   "description": "The universal logger with the pluggable architecture.",
-  "main": "./lib/index-cjs.js",
-  "module": "./lib/index.js",
+  "main": "./lib/index.js",
+  "module": "./lib/index.mjs",
   "types": "./lib/index.d.ts",
-  "typedoc": {
-    "entryPoint": "./src/main/index.ts"
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.mjs",
+      "require": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "sideEffects": false,
   "files": [
     "lib"
   ],
   "scripts": {
-    "build": "tsc --project ./tsconfig.build.json && npm run build:rollup",
-    "build:rollup": "rollup --input ./lib/index.js --file ./lib/index-cjs.js --format cjs --plugin @rollup/plugin-node-resolve",
-    "clean": "rimraf './lib'",
+    "build": "rollup --config ../../rollup.config.js",
+    "clean": "rimraf lib",
     "test": "jest --config ../../jest.config.js",
     "prepack": "cp ../../README.md .",
-    "postpack": "rimraf ./README.md"
+    "postpack": "rimraf README.md"
   },
   "repository": {
     "type": "git",

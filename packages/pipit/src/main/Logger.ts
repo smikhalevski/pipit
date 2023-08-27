@@ -11,7 +11,7 @@ export class Logger implements LogDispatcher {
   channels: LoggerChannel[] = [];
 
   /**
-   * Creates the new {@linkcode Logger} instance.
+   * Creates the new {@link Logger} instance.
    *
    * @param level The minimum log level of messages that would be dispatched to channels.
    * @param context The context that is added to dispatched messages.
@@ -73,7 +73,7 @@ export class Logger implements LogDispatcher {
   }
 
   /**
-   * Log a finer-grained informational message than the {@linkcode debug}, usually with a stack trace.
+   * Log a finer-grained informational message than the {@link debug}, usually with a stack trace.
    */
   trace = (...args: any[]): void => {
     this.dispatch(LogLevel.TRACE, args);
@@ -115,7 +115,7 @@ export class Logger implements LogDispatcher {
   };
 
   /**
-   * The alias for {@linkcode info}.
+   * The alias for {@link info}.
    */
   log = this.info;
 

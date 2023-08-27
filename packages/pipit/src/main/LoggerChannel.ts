@@ -3,7 +3,7 @@
  */
 export interface LogMessage {
   /**
-   * The message severity level. See {@linkcode LogLevel} for reference.
+   * The message severity level. See {@link LogLevel} for reference.
    */
   level: number;
 
@@ -13,7 +13,7 @@ export interface LogMessage {
   args: any[];
 
   /**
-   * The arbitrary message context. See {@linkcode Logger.context} for more derails.
+   * The arbitrary message context. See {@link Logger.context} for more derails.
    */
   context: any;
 }
