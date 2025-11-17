@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest';
 import { LogLevel } from '../../main/index.js';
-import { sendToSentry } from '../../main/processors/sendToSentry.js';
+import sendToSentry from '../../main/processor/sendToSentry.js';
 
 test('sends exceptions', () => {
   const nextMock = vi.fn();

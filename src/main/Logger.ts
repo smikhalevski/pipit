@@ -1,4 +1,4 @@
-import { LogLevel } from './LogLevel.js';
+import { LogLevel, toLevelValue } from './LogLevel.js';
 import { LogDispatcher, LoggerChannel } from './LoggerChannel.js';
 
 /**
@@ -11,43 +11,47 @@ export class Logger implements LogDispatcher {
   channels: LoggerChannel[] = [];
 
   /**
+   * The minimum log level of messages that would be dispatched to channels.
+   */
+  level;
+
+  /**
    * Creates the new {@link Logger} instance.
    *
    * @param level The minimum log level of messages that would be dispatched to channels.
    * @param context The context that is added to dispatched messages.
    */
   constructor(
-    /**
-     * The minimum log level of messages that would be dispatched to channels.
-     */
-    public level = 0,
+    level: LogLevel | number = 0,
     /**
      * The context that is added to dispatched messages.
      */
     public context?: any
-  ) {}
+  ) {
+    this.level = toLevelValue(level);
+  }
 
-  get traceEnabled() {
+  get isTraceEnabled(): boolean {
     return this.level <= LogLevel.TRACE;
   }
 
-  get debugEnabled() {
+  get isDebugEnabled(): boolean {
     return this.level <= LogLevel.DEBUG;
   }
 
-  get infoEnabled() {
+  get isInfoEnabled(): boolean {
     return this.level <= LogLevel.INFO;
   }
 
-  get warnEnabled() {
+  get isWarnEnabled(): boolean {
     return this.level <= LogLevel.WARN;
   }
 
-  get errorEnabled() {
+  get isErrorEnabled(): boolean {
     return this.level <= LogLevel.ERROR;
   }
 
-  get fatalEnabled() {
+  get isFatalEnabled(): boolean {
     return this.level <= LogLevel.FATAL;
   }
 
@@ -68,7 +72,9 @@ export class Logger implements LogDispatcher {
    */
   openChannel(): LoggerChannel {
     const channel = new LoggerChannel();
+
     this.channels.push(channel);
+
     return channel;
   }
 
@@ -124,23 +130,16 @@ export class Logger implements LogDispatcher {
       return;
     }
 
-    let errored = false;
-    let error;
-
     for (const channel of this.channels) {
       try {
         channel.dispatch(level, args, context);
-      } catch (e) {
-        if (errored) {
-          continue;
-        }
-        errored = true;
-        error = e;
+      } catch (error) {
+        setTimeout(throwUncaught, 0, error);
       }
     }
-
-    if (errored) {
-      throw error;
-    }
   }
+}
+
+function throwUncaught(error: unknown): never {
+  throw error;
 }

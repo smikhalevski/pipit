@@ -6,7 +6,7 @@ import { LogLevel } from '../LogLevel.js';
  *
  * @returns The processor callback.
  */
-export function prependLevel(): LogProcessor {
+export default function prependLevel(): LogProcessor {
   return (messages, next) => {
     for (const message of messages) {
       message.args.unshift(getLevelLabel(message.level));

@@ -1,11 +1,17 @@
-export * from './global-logger.js';
+import { Logger } from './Logger.js';
+import printToConsole from './processor/printToConsole.js';
+
 export * from './LogLevel.js';
 export * from './Logger.js';
 export * from './LoggerChannel.js';
-export * from './processors/batchMessages.js';
-export * from './processors/levelCutoff.js';
-export * from './processors/prepend.js';
-export * from './processors/prependDateTime.js';
-export * from './processors/prependLevel.js';
-export * from './processors/printToConsole.js';
-export * from './processors/sendToSentry.js';
+
+/**
+ * The default global logger.
+ *
+ * By default, prints all messages to console.
+ */
+const logger = new Logger();
+
+logger.openChannel().to(printToConsole());
+
+export default logger;

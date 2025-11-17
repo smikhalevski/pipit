@@ -1,18 +1,20 @@
 import { expect, test, vi } from 'vitest';
 import { Logger, LoggerChannel, LogLevel } from '../main/index.js';
 
+vi.useFakeTimers();
+
 test('creates a new logger', () => {
   const logger = new Logger();
 
   expect(logger.level).toBe(0);
   expect(logger.context).toBe(undefined);
   expect(logger.channels.length).toBe(0);
-  expect(logger.traceEnabled).toBe(true);
-  expect(logger.debugEnabled).toBe(true);
-  expect(logger.infoEnabled).toBe(true);
-  expect(logger.warnEnabled).toBe(true);
-  expect(logger.errorEnabled).toBe(true);
-  expect(logger.fatalEnabled).toBe(true);
+  expect(logger.isTraceEnabled).toBe(true);
+  expect(logger.isDebugEnabled).toBe(true);
+  expect(logger.isInfoEnabled).toBe(true);
+  expect(logger.isWarnEnabled).toBe(true);
+  expect(logger.isErrorEnabled).toBe(true);
+  expect(logger.isFatalEnabled).toBe(true);
 });
 
 test('creates a new logger with a log level', () => {
@@ -21,12 +23,12 @@ test('creates a new logger with a log level', () => {
   expect(logger.level).toBe(LogLevel.ERROR);
   expect(logger.context).toBe(undefined);
   expect(logger.channels.length).toBe(0);
-  expect(logger.traceEnabled).toBe(false);
-  expect(logger.debugEnabled).toBe(false);
-  expect(logger.infoEnabled).toBe(false);
-  expect(logger.warnEnabled).toBe(false);
-  expect(logger.errorEnabled).toBe(true);
-  expect(logger.fatalEnabled).toBe(true);
+  expect(logger.isTraceEnabled).toBe(false);
+  expect(logger.isDebugEnabled).toBe(false);
+  expect(logger.isInfoEnabled).toBe(false);
+  expect(logger.isWarnEnabled).toBe(false);
+  expect(logger.isErrorEnabled).toBe(true);
+  expect(logger.isFatalEnabled).toBe(true);
 });
 
 test('appends a channel', () => {
@@ -134,8 +136,10 @@ test('invokes all channels and re-throws the first error', () => {
   logger.openChannel().to(processorMock1);
   logger.openChannel().to(processorMock2);
 
-  expect(() => logger.info('aaa')).toThrow(new Error('expected1'));
+  expect(() => logger.info('aaa')).not.toThrow();
 
   expect(processorMock1).toHaveBeenCalledTimes(1);
   expect(processorMock2).toHaveBeenCalledTimes(1);
+
+  expect(() => vi.runAllTimers()).toThrow(new Error('expected1'));
 });

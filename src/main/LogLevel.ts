@@ -36,3 +36,7 @@ export const LogLevel = {
 } as const;
 
 export type LogLevel = keyof typeof LogLevel;
+
+export function toLevelValue(level: LogLevel | number): number {
+  return typeof level === 'number' ? level : LogLevel[level] | 0;
+}

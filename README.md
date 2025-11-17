@@ -10,25 +10,28 @@ The universal logger with the pluggable architecture.
 npm install --save-prod pipit
 ```
 
-- [Usage](#usage)
-    - [Logging levels](#logging-levels)
-    - [Channels](#channels)
-    - [Processors](#processors)
-- [Built-in processors](#built-in-processors)
-    - [`batchMessages`](#batchmessages)
-    - [`levelCutoff`](#levelcutoff)
-    - [`prepend`](#prepend)
-    - [`prependDateTime`](#prependdatetime)
-    - [`prependLevel`](#prependlevel)
-    - [`printToConsole`](#printtoconsole)
-    - [`sendToSentry`](#sendtosentry)
+<span class="toc-icon">🔰&ensp;</span>[**Usage**](#usage)
+
+- [Logging levels](#logging-levels)
+- [Channels](#channels)
+- [Processors](#processors)
+
+<span class="toc-icon">🧩&ensp;</span>**Built-in processors**
+
+- [`batchMessages`](#batchmessages)
+- [`levelCutoff`](#levelcutoff)
+- [`prepend`](#prepend)
+- [`prependDateTime`](#prependdatetime)
+- [`prependLevel`](#prependlevel)
+- [`printToConsole`](#printtoconsole)
+- [`sendToSentry`](#sendtosentry)
 
 # Usage
 
 You can start using Pipit as a replacement for `console` logging, no additional configuration is required:
 
 ```ts
-import { logger } from 'pipit';
+import logger from 'pipit';
 
 logger.log('Oh, snap!');
 ```
@@ -62,7 +65,7 @@ myLogger.error('An error event that might still allow the application to continu
 myLogger.warn('Potentially harmful situation');
 
 myLogger.info('Highlight the progress of the application at coarse-grained level');
-// or myLogger.log( … )
+// or myLogger.log(…)
 
 myLogger.debug('Useful to debug an application');
 
@@ -74,7 +77,7 @@ By default, `Logger` sends all messages to channels, but you can set a minimum r
 ```ts
 import { Logger, LogLevel } from 'pipit';
 
-// Log messages that have an error severity level or higher 
+// Log messages that have an error severity level or higher
 const myLogger = new Logger(LogLevel.ERROR);
 
 // This message is ignored
@@ -89,19 +92,14 @@ myLogger.fatal('Damn!');
 You can open as many channels on a single logger as you need:
 
 ```ts
-import {levelCutoff, Logger, LogLevel, printToConsole} from 'pipit';
-import {sendToSentry} from 'src/main/plugin/sentry';
+import { levelCutoff, Logger, LogLevel, printToConsole } from 'pipit';
+import sendToSentry from 'src/main/plugin/sentry';
 
 const myLogger = new Logger();
 
-myLogger
-  .openChannel()
-  .to(printToConsole());
+myLogger.openChannel().to(printToConsole());
 
-myLogger
-  .openChannel()
-  .to(levelCutoff(LogLevel.ERROR))
-  .to(sendToSentry());
+myLogger.openChannel().to(levelCutoff(LogLevel.ERROR)).to(sendToSentry());
 
 myLogger.log('Good job');
 
@@ -115,8 +113,8 @@ You can remove all channels using `reset`. This is especially useful if you want
 logger.
 
 ```ts
-import {logger} from 'pipit';
-import {sendToSentry} from 'src/main/plugin/sentry';
+import logger from 'pipit';
+import sendToSentry from 'pipit/processor/sendToSentry';
 
 // Send all messages to Sentry
 logger.reset().openChannel().to(sendToSentry());
@@ -167,13 +165,13 @@ const myLogger2 = new Logger();
 myLogger1.openChannel().to(myLogger2);
 ```
 
-# Built-in processors
-
-## `batchMessages`
+# `batchMessages`
 
 Batches messages using a timeout and/or limit strategy.
 
 ```ts
+import batchMessages from 'pipit/processor/batchMessages';
+
 myLogger
   .openChannel()
   .to(batchMessages({ timeout: 1_000, limit: 2 }))
@@ -191,17 +189,16 @@ By default, at most 50 messages are batched in the 1s timeframe. You can provide
 `limit` options at the same time and when any constraint is hit, then batched messages are sent to the next
 processor.
 
-## `levelCutoff`
+# `levelCutoff`
 
 Excludes messages that have an insufficient severity level.
 
 ```ts
 import { LogLevel } from 'pipit';
+import levelCutoff from 'pipit/processor/levelCutoff';
+import printToConsole from 'pipit/processor/printToConsole';
 
-myLogger
-  .openChannel()
-  .to(levelCutoff(LogLevel.WARN))
-  .to(printToConsole());
+myLogger.openChannel().to(levelCutoff(LogLevel.WARN)).to(printToConsole());
 
 myLogger.info('Something happened');
 // Does nothing, since level of this message is INFO
@@ -213,66 +210,68 @@ myLogger.fatal('The base is under attack');
 This processor comes handy if you have multiple channels in your logger and want some of them to be used only if message
 is severe enough.
 
-## `prepend`
+# `prepend`
 
 Prepends a set args to each message.
 
 ```ts
-myLogger
-  .openChannel()
-  .to(prepend('Hello,'))
-  .to(printToConsole());
+import prepend from 'pipit/processor/prepend';
+import printToConsole from 'pipit/processor/printToConsole';
+
+myLogger.openChannel().to(prepend('Hello,')).to(printToConsole());
 
 myLogger.log('Boss');
 // ⮕ 'Hello, Boss'
 ```
 
-## `prependDateTime`
+# `prependDateTime`
 
 Prepends date and time in ISO format to each message.
 
 ```ts
-myLogger
-  .openChannel()
-  .to(prependDateTime())
-  .to(printToConsole());
+import prependDateTime from 'pipit/processor/prependDateTime';
+import printToConsole from 'pipit/processor/printToConsole';
+
+myLogger.openChannel().to(prependDateTime()).to(printToConsole());
 
 myLogger.log('Okay, cowboy');
 // ⮕ '2022-11-25T16:59:44.286Z Okay, cowboy'
 ```
 
-## `prependLevel`
+# `prependLevel`
 
 Prepends severity level label to each message.
 
 ```ts
-myLogger
-  .openChannel()
-  .to(prependLevel())
-  .to(printToConsole());
+import prependLevel from 'pipit/processor/prependLevel';
+import printToConsole from 'pipit/processor/printToConsole';
+
+myLogger.openChannel().to(prependLevel()).to(printToConsole());
 
 myLogger.fatal('No way!');
 // ⮕ 'FATAL No way
 ```
 
-## `printToConsole`
+# `printToConsole`
 
 Prints messages to the console.
 
 ```ts
+import printToConsole from 'pipit/processor/printToConsole';
+
 myLogger.openChannel().to(printToConsole());
 
 myLogger.log('Okay');
 // ⮕ 'Okay'
 ```
 
-## `sendToSentry`
+# `sendToSentry`
 
 Sends a message to [Sentry](https://sentry.io).
 
 ```ts
-import {logger} from 'pipit';
-import {sendToSentry} from './index';
+import logger from 'pipit';
+import sendToSentry from 'pipit/processor/sendToSentry';
 import * as Sentry from '@sentry/browser';
 
 logger.openChannel().to(sendToSentry(Sentry));
