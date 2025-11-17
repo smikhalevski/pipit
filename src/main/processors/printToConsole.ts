@@ -1,5 +1,5 @@
-import { LogLevel } from '../LogLevel';
-import { LogProcessor } from '../LoggerChannel';
+import { LogLevel } from '../LogLevel.js';
+import { LogProcessor } from '../LoggerChannel.js';
 
 /**
  * Prints messages to console.

@@ -1,5 +1,5 @@
-import { LogLevel } from './LogLevel';
-import { LogDispatcher, LoggerChannel } from './LoggerChannel';
+import { LogLevel } from './LogLevel.js';
+import { LogDispatcher, LoggerChannel } from './LoggerChannel.js';
 
 /**
  * Dispatches logged messages to channels.

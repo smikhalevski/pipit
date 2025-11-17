@@ -89,8 +89,8 @@ myLogger.fatal('Damn!');
 You can open as many channels on a single logger as you need:
 
 ```ts
-import { levelCutoff, Logger, LogLevel, printToConsole } from 'pipit';
-import { sendToSentry } from '@pipit/sentry';
+import {levelCutoff, Logger, LogLevel, printToConsole} from 'pipit';
+import {sendToSentry} from 'src/main/plugin/sentry';
 
 const myLogger = new Logger();
 
@@ -115,8 +115,8 @@ You can remove all channels using `reset`. This is especially useful if you want
 logger.
 
 ```ts
-import { logger } from 'pipit';
-import { sendToSentry } from '@pipit/sentry';
+import {logger} from 'pipit';
+import {sendToSentry} from 'src/main/plugin/sentry';
 
 // Send all messages to Sentry
 logger.reset().openChannel().to(sendToSentry());
@@ -271,14 +271,12 @@ myLogger.log('Okay');
 Sends a message to [Sentry](https://sentry.io).
 
 ```ts
-import { Logger } from 'pipit';
-import { sendToSentry } from '@pipit/sentry';
+import {logger} from 'pipit';
+import {sendToSentry} from './index';
 import * as Sentry from '@sentry/browser';
 
-const myLogger = new Logger();
+logger.openChannel().to(sendToSentry(Sentry));
 
-myLogger.openChannel().to(sendToSentry(Sentry));
-
-myLogger.log('To the moon!');
-// Prints nothing, sends everything to Sentry
+logger.log('To the moon!');
+// Prints message to console and sends it to Sentry
 ```

@@ -1,5 +1,5 @@
-import { Logger } from './Logger';
-import { printToConsole } from './processors';
+import { Logger } from './Logger.js';
+import { printToConsole } from './processors/printToConsole.js';
 
 /**
  * The default global logger.

@@ -1,4 +1,4 @@
-import { LogProcessor } from '../LoggerChannel';
+import { LogProcessor } from '../LoggerChannel.js';
 
 /**
  * Prepends date and time in ISO format to each message.

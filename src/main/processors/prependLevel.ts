@@ -1,5 +1,5 @@
-import { LogProcessor } from '../LoggerChannel';
-import { LogLevel } from '../LogLevel';
+import { LogProcessor } from '../LoggerChannel.js';
+import { LogLevel } from '../LogLevel.js';
 
 /**
  * Prepends severity level label to each message.
@@ -16,7 +16,7 @@ export function prependLevel(): LogProcessor {
   };
 }
 
-function getLevelLabel(level: LogLevel): string {
+function getLevelLabel(level: number): string {
   if (level < LogLevel.DEBUG) {
     return 'TRACE';
   }

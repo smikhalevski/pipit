@@ -1,5 +1,4 @@
-import { LogMessage, LogProcessor } from '../LoggerChannel';
-import { LogLevel } from '../LogLevel';
+import { LogMessage, LogProcessor } from '../LoggerChannel.js';
 
 /**
  * Excludes messages that have an insufficient severity level.
@@ -7,7 +6,7 @@ import { LogLevel } from '../LogLevel';
  * @param level The minimum severity level of the message to pass.
  * @returns The processor callback.
  */
-export function levelCutoff(level: LogLevel): LogProcessor {
+export function levelCutoff(level: number): LogProcessor {
   const filter = (message: LogMessage) => message.level >= level;
 
   return (messages, next) => {

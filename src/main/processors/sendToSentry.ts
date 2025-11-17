@@ -1,5 +1,11 @@
-import { LogLevel, LogProcessor } from 'pipit';
-import { Client } from '@sentry/types';
+import { LogProcessor } from '../LoggerChannel.js';
+import { LogLevel } from '../LogLevel.js';
+
+interface SentryClient {
+  captureMessage(message: any): void;
+
+  captureException(message: any): void;
+}
 
 /**
  * Sends messages to [Sentry](https://sentry.io).
@@ -10,7 +16,7 @@ import { Client } from '@sentry/types';
  * @param client The Sentry client.
  * @returns The processor callback.
  */
-export function sendToSentry(client: Pick<Client, 'captureMessage' | 'captureException'>): LogProcessor {
+export function sendToSentry(client: SentryClient): LogProcessor {
   return (messages, next) => {
     for (const message of messages) {
       if (message.level >= LogLevel.ERROR) {

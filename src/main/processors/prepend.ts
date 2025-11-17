@@ -1,4 +1,4 @@
-import { LogProcessor } from '../LoggerChannel';
+import { LogProcessor } from '../LoggerChannel.js';
 
 /**
  * Prepends args to each message and passes them to the next processor.

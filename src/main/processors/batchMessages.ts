@@ -1,4 +1,4 @@
-import { LogMessage, LogProcessor } from '../LoggerChannel';
+import { LogMessage, LogProcessor } from '../LoggerChannel.js';
 
 /**
  * Options passed to {@link batchMessages}.

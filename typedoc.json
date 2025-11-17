@@ -7,10 +7,10 @@
   "disableSources": true,
   "hideGenerator": true,
   "readme": "none",
-  "tsconfig": "./tsconfig.build.json",
-  "customCss": "./node_modules/typedoc-custom-css/custom.css",
-  "entryPoints": [
-    "./packages/pipit/src/main/index.ts",
-    "./packages/sentry/src/main/index.ts"
-  ]
+  "tsconfig": "./tsconfig.json",
+  "navigation": {
+    "includeFolders": false
+  },
+  "entryPoints": ["./src/main/index.ts"],
+  "intentionallyNotExported": ["SentryClient"]
 }
