@@ -7,6 +7,13 @@
   "types": "./index.d.ts",
   "exports": {
     ".": "./index.js",
+    "./preprocessor/batchMessages": "./preprocessor/batchMessages.js",
+    "./preprocessor/levelCutoff": "./preprocessor/levelCutoff.js",
+    "./preprocessor/prepend": "./preprocessor/prepend.js",
+    "./preprocessor/prependDateTime": "./preprocessor/prependDateTime.js",
+    "./preprocessor/prependLevel": "./preprocessor/prependLevel.js",
+    "./preprocessor/printToConsole": "./preprocessor/printToConsole.js",
+    "./preprocessor/sendToSentry": "./preprocessor/sendToSentry.js",
     "./package.json": "./package.json"
   },
   "sideEffects": false,

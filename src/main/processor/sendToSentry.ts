@@ -16,7 +16,7 @@ interface SentryClient {
  * @param client The Sentry client.
  * @returns The processor callback.
  */
-export function sendToSentry(client: SentryClient): LogProcessor {
+export default function sendToSentry(client: SentryClient): LogProcessor {
   return (messages, next) => {
     for (const message of messages) {
       if (message.level >= LogLevel.ERROR) {

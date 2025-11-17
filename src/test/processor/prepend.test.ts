@@ -1,5 +1,6 @@
 import { expect, test, vi } from 'vitest';
-import { LogMessage, prepend } from '../../main/index.js';
+import { LogMessage } from '../../main/index.js';
+import prepend from '../../main/processor/prepend.js';
 
 test('prepends args to each message', () => {
   const nextMock = vi.fn();

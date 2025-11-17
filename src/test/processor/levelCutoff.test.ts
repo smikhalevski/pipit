@@ -1,5 +1,6 @@
 import { expect, test, vi } from 'vitest';
-import { levelCutoff, LogMessage } from '../../main/index.js';
+import { LogMessage } from '../../main/index.js';
+import levelCutoff from '../../main/processor/levelCutoff.js';
 
 test('passes message as is', () => {
   const nextMock = vi.fn();

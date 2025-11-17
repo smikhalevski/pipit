@@ -1,5 +1,6 @@
 import { afterEach, expect, test, vi } from 'vitest';
-import { LogLevel, LogMessage, printToConsole } from '../../main/index.js';
+import { LogLevel, LogMessage } from '../../main/index.js';
+import printToConsole from '../../main/processor/printToConsole.js';
 
 const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);

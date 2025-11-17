@@ -64,12 +64,14 @@ export class LoggerChannel implements LogDispatcher {
         next(messages);
       };
     }
+
     this.processors.push(processor);
+
     return this;
   }
 
   dispatch(level: number, args: any[], context?: any): void {
-    callProcessor(this.processors, 0, [{ level, args, context }]);
+    callProcessor(this.processors.slice(0), 0, [{ level, args, context }]);
   }
 }
 

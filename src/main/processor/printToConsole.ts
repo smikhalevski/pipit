@@ -6,7 +6,7 @@ import { LogProcessor } from '../LoggerChannel.js';
  *
  * @returns The processor callback.
  */
-export function printToConsole(): LogProcessor {
+export default function printToConsole(): LogProcessor {
   return (messages, next) => {
     for (const { level, args } of messages) {
       if (level >= LogLevel.ERROR) {

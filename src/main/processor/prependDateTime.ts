@@ -5,7 +5,7 @@ import { LogProcessor } from '../LoggerChannel.js';
  *
  * @returns The processor callback.
  */
-export function prependDateTime(): LogProcessor {
+export default function prependDateTime(): LogProcessor {
   return (messages, next) => {
     const date = new Date().toISOString();
 
