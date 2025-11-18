@@ -20,8 +20,8 @@ npm install --save-prod pipit
 
 - [`batchMessages`](#batchmessages)
 - [`levelCutoff`](#levelcutoff)
-- [`prepend`](#prepend)
-- [`prependDateTime`](#prependdatetime)
+- [`prependArgs`](#prependargs)
+- [`prependTimestamp`](#prependtimestamp)
 - [`prependLevel`](#prependlevel)
 - [`printToConsole`](#printtoconsole)
 - [`sendToSentry`](#sendtosentry)
@@ -210,29 +210,29 @@ myLogger.fatal('The base is under attack');
 This processor comes handy if you have multiple channels in your logger and want some of them to be used only if message
 is severe enough.
 
-# `prepend`
+# `prependArgs`
 
 Prepends a set args to each message.
 
 ```ts
-import prepend from 'pipit/processor/prepend';
+import prependArgs from 'pipit/processor/prependArgs';
 import printToConsole from 'pipit/processor/printToConsole';
 
-myLogger.openChannel().to(prepend('Hello,')).to(printToConsole());
+myLogger.openChannel().to(prependArgs('Hello,')).to(printToConsole());
 
 myLogger.log('Boss');
 // ⮕ 'Hello, Boss'
 ```
 
-# `prependDateTime`
+# `prependTimestamp`
 
 Prepends date and time in ISO format to each message.
 
 ```ts
-import prependDateTime from 'pipit/processor/prependDateTime';
+import prependTimestamp from 'pipit/processor/prependTimestamp';
 import printToConsole from 'pipit/processor/printToConsole';
 
-myLogger.openChannel().to(prependDateTime()).to(printToConsole());
+myLogger.openChannel().to(prependTimestamp()).to(printToConsole());
 
 myLogger.log('Okay, cowboy');
 // ⮕ '2022-11-25T16:59:44.286Z Okay, cowboy'

@@ -10,7 +10,7 @@
     "./preprocessor/batchMessages": "./preprocessor/batchMessages.js",
     "./preprocessor/levelCutoff": "./preprocessor/levelCutoff.js",
     "./preprocessor/prepend": "./preprocessor/prepend.js",
-    "./preprocessor/prependDateTime": "./preprocessor/prependDateTime.js",
+    "./preprocessor/prependTimestamp": "./preprocessor/prependTimestamp.js",
     "./preprocessor/prependLevel": "./preprocessor/prependLevel.js",
     "./preprocessor/printToConsole": "./preprocessor/printToConsole.js",
     "./preprocessor/sendToSentry": "./preprocessor/sendToSentry.js",

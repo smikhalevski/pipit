@@ -1,5 +1,5 @@
 import { Logger } from './Logger.js';
-import printToConsole from './processor/printToConsole.js';
+import printToConsole from './processor/writeToConsole.js';
 
 export * from './LogLevel.js';
 export * from './Logger.js';
