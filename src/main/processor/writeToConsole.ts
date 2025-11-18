@@ -2,11 +2,9 @@ import { LogLevel } from '../LogLevel.js';
 import { LogProcessor } from '../LoggerChannel.js';
 
 /**
- * Prints messages to console.
- *
- * @returns The processor callback.
+ * Writes messages to console.
  */
-export default function printToConsole(): LogProcessor {
+export default function writeToConsole(): LogProcessor {
   return (messages, next) => {
     for (const { level, args } of messages) {
       if (level >= LogLevel.ERROR) {
@@ -17,14 +15,19 @@ export default function printToConsole(): LogProcessor {
         console.warn(...args);
         continue;
       }
-      if (level < LogLevel.DEBUG) {
-        console.trace(...args);
+      if (level >= LogLevel.INFO) {
+        console.info(...args);
         continue;
       }
-      if (level < LogLevel.INFO) {
+      if (level >= LogLevel.DEBUG) {
         console.debug(...args);
         continue;
       }
+      if (level >= LogLevel.TRACE) {
+        console.trace(...args);
+        continue;
+      }
+
       console.log(...args);
     }
 

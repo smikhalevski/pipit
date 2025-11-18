@@ -5,12 +5,12 @@ import { LogProcessor } from '../LoggerChannel.js';
  *
  * @returns The processor callback.
  */
-export default function prependDateTime(): LogProcessor {
+export default function prependTimestamp(): LogProcessor {
   return (messages, next) => {
-    const date = new Date().toISOString();
+    const timestamp = new Date().toISOString();
 
     for (const message of messages) {
-      message.args.unshift(date);
+      message.args.unshift(timestamp);
     }
 
     next(messages);

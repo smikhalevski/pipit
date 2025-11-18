@@ -1,0 +1,17 @@
+import { LogProcessor } from '../LoggerChannel.js';
+import { inspect } from '../inspect.js';
+
+/**
+ * Prepends args to each message and passes them to the next processor.
+ *
+ * @returns The processor callback.
+ */
+export default function inspectArgs(): LogProcessor {
+  return (messages, next) => {
+    for (const message of messages) {
+      message.args = message.args.map(arg => inspect(arg));
+    }
+
+    next(messages);
+  };
+}
