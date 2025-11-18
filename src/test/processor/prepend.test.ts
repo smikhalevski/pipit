@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest';
 import { LogMessage } from '../../main/index.js';
-import prepend from '../../main/processor/prepend.js';
+import prependArgs from '../../main/processor/prependArgs.js';
 
 test('prepends args to each message', () => {
   const nextMock = vi.fn();
@@ -9,7 +9,7 @@ test('prepends args to each message', () => {
     { level: 222, args: ['bbb'], context: undefined },
   ];
 
-  prepend('ccc')(messages, nextMock);
+  prependArgs('ccc')(messages, nextMock);
 
   expect(messages[0].args).toEqual(['ccc', 'aaa']);
   expect(messages[1].args).toEqual(['ccc', 'bbb']);

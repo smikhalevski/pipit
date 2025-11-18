@@ -3,10 +3,10 @@ import { LogProcessor } from '../LoggerChannel.js';
 /**
  * Prepends args to each message and passes them to the next processor.
  *
- * @param args The args to prepend.
+ * @param args The args to prependArgs.
  * @returns The processor callback.
  */
-export default function prepend(...args: unknown[]): LogProcessor {
+export default function prependArgs(...args: unknown[]): LogProcessor {
   return (messages, next) => {
     for (const message of messages) {
       message.args.unshift(...args);
