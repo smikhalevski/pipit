@@ -1,4 +1,4 @@
-import { LogLevel, toLevelValue } from './LogLevel.js';
+import { Level } from './Level.js';
 import { LogDispatcher, LoggerChannel } from './LoggerChannel.js';
 
 /**
@@ -11,48 +11,38 @@ export class Logger implements LogDispatcher {
   channels: LoggerChannel[] = [];
 
   /**
-   * The minimum log level of messages that would be dispatched to channels.
-   */
-  level;
-
-  /**
    * Creates the new {@link Logger} instance.
    *
    * @param level The minimum log level of messages that would be dispatched to channels.
    * @param context The context that is added to dispatched messages.
    */
   constructor(
-    level: LogLevel | number = 0,
-    /**
-     * The context that is added to dispatched messages.
-     */
+    public level = 0,
     public context?: any
-  ) {
-    this.level = toLevelValue(level);
-  }
+  ) {}
 
   get isTraceEnabled(): boolean {
-    return this.level <= LogLevel.TRACE;
+    return this.level <= Level.TRACE;
   }
 
   get isDebugEnabled(): boolean {
-    return this.level <= LogLevel.DEBUG;
+    return this.level <= Level.DEBUG;
   }
 
   get isInfoEnabled(): boolean {
-    return this.level <= LogLevel.INFO;
+    return this.level <= Level.INFO;
   }
 
   get isWarnEnabled(): boolean {
-    return this.level <= LogLevel.WARN;
+    return this.level <= Level.WARN;
   }
 
   get isErrorEnabled(): boolean {
-    return this.level <= LogLevel.ERROR;
+    return this.level <= Level.ERROR;
   }
 
   get isFatalEnabled(): boolean {
-    return this.level <= LogLevel.FATAL;
+    return this.level <= Level.FATAL;
   }
 
   /**
@@ -82,42 +72,42 @@ export class Logger implements LogDispatcher {
    * Log a finer-grained informational message than the {@link debug}, usually with a stack trace.
    */
   trace = (...args: any[]): void => {
-    this.dispatch(LogLevel.TRACE, args);
+    this.dispatch(Level.TRACE, args);
   };
 
   /**
    * Log a fine-grained informational message that are most useful to debug an application.
    */
   debug = (...args: any[]): void => {
-    this.dispatch(LogLevel.DEBUG, args);
+    this.dispatch(Level.DEBUG, args);
   };
 
   /**
    * Log an informational message that highlight the progress of the application at coarse-grained level.
    */
   info = (...args: any[]): void => {
-    this.dispatch(LogLevel.INFO, args);
+    this.dispatch(Level.INFO, args);
   };
 
   /**
    * Log a potentially harmful situation.
    */
   warn = (...args: any[]): void => {
-    this.dispatch(LogLevel.WARN, args);
+    this.dispatch(Level.WARN, args);
   };
 
   /**
    * Log an error event that might still allow the application to continue running.
    */
   error = (...args: any[]): void => {
-    this.dispatch(LogLevel.ERROR, args);
+    this.dispatch(Level.ERROR, args);
   };
 
   /**
    * Log a very severe error events that will presumably lead the application to abort.
    */
   fatal = (...args: any[]): void => {
-    this.dispatch(LogLevel.FATAL, args);
+    this.dispatch(Level.FATAL, args);
   };
 
   /**
@@ -134,12 +124,10 @@ export class Logger implements LogDispatcher {
       try {
         channel.dispatch(level, args, context);
       } catch (error) {
-        setTimeout(throwUncaught, 0, error);
+        setTimeout(() => {
+          throw error;
+        }, 0);
       }
     }
   }
-}
-
-function throwUncaught(error: unknown): never {
-  throw error;
 }

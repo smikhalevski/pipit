@@ -1,5 +1,5 @@
 import { LogProcessor } from '../LoggerChannel.js';
-import { LogLevel } from '../LogLevel.js';
+import { Level } from '../Level.js';
 
 /**
  * Prepends args to each message and passes them to the next processor.
@@ -25,19 +25,19 @@ export default function stringifyJSON(): LogProcessor {
 }
 
 function getLevelLabel(level: number): string {
-  if (level < LogLevel.DEBUG) {
+  if (level < Level.DEBUG) {
     return 'trace';
   }
-  if (level < LogLevel.INFO) {
+  if (level < Level.INFO) {
     return 'debug';
   }
-  if (level < LogLevel.WARN) {
+  if (level < Level.WARN) {
     return 'info ';
   }
-  if (level < LogLevel.ERROR) {
+  if (level < Level.ERROR) {
     return 'warn ';
   }
-  if (level < LogLevel.FATAL) {
+  if (level < Level.FATAL) {
     return 'error';
   }
   return 'fatal';

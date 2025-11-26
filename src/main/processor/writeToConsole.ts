@@ -1,4 +1,4 @@
-import { LogLevel } from '../LogLevel.js';
+import { Level } from '../Level.js';
 import { LogProcessor } from '../LoggerChannel.js';
 
 /**
@@ -7,23 +7,23 @@ import { LogProcessor } from '../LoggerChannel.js';
 export default function writeToConsole(): LogProcessor {
   return (messages, next) => {
     for (const { level, args } of messages) {
-      if (level >= LogLevel.ERROR) {
+      if (level >= Level.ERROR) {
         console.error(...args);
         continue;
       }
-      if (level >= LogLevel.WARN) {
+      if (level >= Level.WARN) {
         console.warn(...args);
         continue;
       }
-      if (level >= LogLevel.INFO) {
+      if (level >= Level.INFO) {
         console.info(...args);
         continue;
       }
-      if (level >= LogLevel.DEBUG) {
+      if (level >= Level.DEBUG) {
         console.debug(...args);
         continue;
       }
-      if (level >= LogLevel.TRACE) {
+      if (level >= Level.TRACE) {
         console.trace(...args);
         continue;
       }

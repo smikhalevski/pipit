@@ -3,7 +3,7 @@
  */
 export interface LogMessage {
   /**
-   * The message severity level. See {@link LogLevel} for reference.
+   * The message severity level. See {@link Level} for reference.
    */
   level: number;
 

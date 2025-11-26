@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest';
-import { LogLevel, LogMessage } from '../../main/index.js';
+import { Level, LogMessage } from '../../main/index.js';
 import printToConsole from '../../main/processor/writeToConsole.js';
 
 const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
@@ -19,12 +19,12 @@ afterEach(() => {
 test('calls console methods', () => {
   const nextMock = vi.fn();
   const messages: LogMessage[] = [
-    { level: LogLevel.TRACE, args: ['aaa_trace'], context: undefined },
-    { level: LogLevel.DEBUG, args: ['aaa_debug'], context: undefined },
-    { level: LogLevel.INFO, args: ['aaa_info'], context: undefined },
-    { level: LogLevel.WARN, args: ['aaa_warn'], context: undefined },
-    { level: LogLevel.ERROR, args: ['aaa_error'], context: undefined },
-    { level: LogLevel.FATAL, args: ['aaa_fatal'], context: undefined },
+    { level: Level.TRACE, args: ['aaa_trace'], context: undefined },
+    { level: Level.DEBUG, args: ['aaa_debug'], context: undefined },
+    { level: Level.INFO, args: ['aaa_info'], context: undefined },
+    { level: Level.WARN, args: ['aaa_warn'], context: undefined },
+    { level: Level.ERROR, args: ['aaa_error'], context: undefined },
+    { level: Level.FATAL, args: ['aaa_fatal'], context: undefined },
   ];
 
   printToConsole()(messages, nextMock);

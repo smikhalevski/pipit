@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest';
-import { Logger, LoggerChannel, LogLevel } from '../main/index.js';
+import { Logger, LoggerChannel, Level } from '../main/index.js';
 
 vi.useFakeTimers();
 
@@ -18,9 +18,9 @@ test('creates a new logger', () => {
 });
 
 test('creates a new logger with a log level', () => {
-  const logger = new Logger(LogLevel.ERROR);
+  const logger = new Logger(Level.ERROR);
 
-  expect(logger.level).toBe(LogLevel.ERROR);
+  expect(logger.level).toBe(Level.ERROR);
   expect(logger.context).toBe(undefined);
   expect(logger.channels.length).toBe(0);
   expect(logger.isTraceEnabled).toBe(false);
@@ -52,7 +52,7 @@ test('dispatches an info message', () => {
   logger.info('aaa', 'bbb');
 
   expect(dispatchSpy).toHaveBeenCalledTimes(1);
-  expect(dispatchSpy).toHaveBeenNthCalledWith(1, LogLevel.INFO, ['aaa', 'bbb']);
+  expect(dispatchSpy).toHaveBeenNthCalledWith(1, Level.INFO, ['aaa', 'bbb']);
 });
 
 test('info is bound to logger', () => {
@@ -64,7 +64,7 @@ test('info is bound to logger', () => {
   info('aaa', 'bbb');
 
   expect(dispatchSpy).toHaveBeenCalledTimes(1);
-  expect(dispatchSpy).toHaveBeenNthCalledWith(1, LogLevel.INFO, ['aaa', 'bbb']);
+  expect(dispatchSpy).toHaveBeenNthCalledWith(1, Level.INFO, ['aaa', 'bbb']);
 });
 
 test('dispatches message to all channels', () => {
@@ -80,20 +80,20 @@ test('dispatches message to all channels', () => {
   expect(processorMock1).toHaveBeenCalledTimes(1);
   expect(processorMock1).toHaveBeenNthCalledWith(
     1,
-    [{ level: LogLevel.INFO, args: ['aaa'], context: undefined }],
+    [{ level: Level.INFO, args: ['aaa'], context: undefined }],
     expect.any(Function)
   );
   expect(processorMock2).toHaveBeenCalledTimes(1);
   expect(processorMock2).toHaveBeenNthCalledWith(
     1,
-    [{ level: LogLevel.INFO, args: ['aaa'], context: undefined }],
+    [{ level: Level.INFO, args: ['aaa'], context: undefined }],
     expect.any(Function)
   );
 });
 
 test('does not dispatch message if level is insufficient', () => {
   const processorMock = vi.fn();
-  const logger = new Logger(LogLevel.ERROR);
+  const logger = new Logger(Level.ERROR);
 
   logger.openChannel().to(processorMock);
 
@@ -119,7 +119,7 @@ test('attaches logger context', () => {
   expect(processorMock).toHaveBeenCalledTimes(1);
   expect(processorMock).toHaveBeenNthCalledWith(
     1,
-    [{ level: LogLevel.INFO, args: ['aaa'], context: 111 }],
+    [{ level: Level.INFO, args: ['aaa'], context: 111 }],
     expect.any(Function)
   );
 });

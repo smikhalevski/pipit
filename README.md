@@ -75,10 +75,10 @@ myLogger.trace('A finer-grained informational message than debug, usually with a
 By default, `Logger` sends all messages to channels, but you can set a minimum required level of the message severity:
 
 ```ts
-import { Logger, LogLevel } from 'pipit';
+import { Logger, Level } from 'pipit';
 
 // Log messages that have an error severity level or higher
-const myLogger = new Logger(LogLevel.ERROR);
+const myLogger = new Logger(Level.ERROR);
 
 // This message is ignored
 myLogger.debug('Hello there');
@@ -92,14 +92,14 @@ myLogger.fatal('Damn!');
 You can open as many channels on a single logger as you need:
 
 ```ts
-import { levelCutoff, Logger, LogLevel, printToConsole } from 'pipit';
+import { levelCutoff, Logger, Level, printToConsole } from 'pipit';
 import sendToSentry from 'src/main/plugin/sentry';
 
 const myLogger = new Logger();
 
 myLogger.openChannel().to(printToConsole());
 
-myLogger.openChannel().to(levelCutoff(LogLevel.ERROR)).to(sendToSentry());
+myLogger.openChannel().to(levelCutoff(Level.ERROR)).to(sendToSentry());
 
 myLogger.log('Good job');
 
@@ -123,7 +123,7 @@ logger.reset().openChannel().to(sendToSentry());
 You can also reset the logging level:
 
 ```ts
-logger.reset(LogLevel.WARN);
+logger.reset(Level.WARN);
 ```
 
 ## Processors
@@ -194,11 +194,11 @@ processor.
 Excludes messages that have an insufficient severity level.
 
 ```ts
-import { LogLevel } from 'pipit';
+import { Level } from 'pipit';
 import levelCutoff from 'pipit/processor/levelCutoff';
 import printToConsole from 'pipit/processor/printToConsole';
 
-myLogger.openChannel().to(levelCutoff(LogLevel.WARN)).to(printToConsole());
+myLogger.openChannel().to(levelCutoff(Level.WARN)).to(printToConsole());
 
 myLogger.info('Something happened');
 // Does nothing, since level of this message is INFO

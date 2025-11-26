@@ -1,4 +1,7 @@
-export const LogLevel = {
+/**
+ * The well-known logging levels.
+ */
+export const Level = {
   /**
    * Designates finer-grained informational events than the {@link DEBUG}, usually with a stack trace.
    */
@@ -34,9 +37,3 @@ export const LogLevel = {
    */
   OFF: Infinity,
 } as const;
-
-export type LogLevel = keyof typeof LogLevel;
-
-export function toLevelValue(level: LogLevel | number): number {
-  return typeof level === 'number' ? level : LogLevel[level] | 0;
-}

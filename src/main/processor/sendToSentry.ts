@@ -1,5 +1,5 @@
 import { LogProcessor } from '../LoggerChannel.js';
-import { LogLevel } from '../LogLevel.js';
+import { Level } from '../Level.js';
 
 interface SentryClient {
   captureMessage(message: any): void;
@@ -10,7 +10,7 @@ interface SentryClient {
 /**
  * Sends messages to [Sentry](https://sentry.io).
  *
- * Messages with level greater or equal to {@link LogLevel.ERROR} are sent as exceptions. Others are sent as regular
+ * Messages with level greater or equal to {@link Level.ERROR} are sent as exceptions. Others are sent as regular
  * messages.
  *
  * @param client The Sentry client.
@@ -19,7 +19,7 @@ interface SentryClient {
 export default function sendToSentry(client: SentryClient): LogProcessor {
   return (messages, next) => {
     for (const message of messages) {
-      if (message.level >= LogLevel.ERROR) {
+      if (message.level >= Level.ERROR) {
         client.captureException(message.args[0]);
       } else {
         client.captureMessage(message.args[0]);
