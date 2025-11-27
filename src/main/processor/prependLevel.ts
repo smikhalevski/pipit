@@ -1,5 +1,5 @@
-import { LogProcessor } from '../LoggerChannel.js';
 import { Level } from '../Level.js';
+import type { LogProcessor } from '../types.js';
 
 /**
  * Prepends severity level label to each message.

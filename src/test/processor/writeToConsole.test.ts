@@ -1,11 +1,12 @@
 import { afterEach, expect, test, vi } from 'vitest';
 import { Level, LogMessage } from '../../main/index.js';
-import printToConsole from '../../main/processor/writeToConsole.js';
+import writeToConsole from '../../main/processor/writeToConsole.js';
 
 const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 const traceSpy = vi.spyOn(console, 'trace').mockImplementation(() => undefined);
 const debugSpy = vi.spyOn(console, 'debug').mockImplementation(() => undefined);
+const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
 const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
 
 afterEach(() => {
@@ -13,6 +14,7 @@ afterEach(() => {
   warnSpy.mockReset();
   traceSpy.mockReset();
   debugSpy.mockReset();
+  infoSpy.mockReset();
   logSpy.mockReset();
 });
 
@@ -27,7 +29,7 @@ test('calls console methods', () => {
     { level: Level.FATAL, args: ['aaa_fatal'], context: undefined },
   ];
 
-  printToConsole()(messages, nextMock);
+  writeToConsole()(messages, nextMock);
 
   expect(nextMock).toHaveBeenCalledTimes(1);
   expect(nextMock).toHaveBeenNthCalledWith(1, messages);
@@ -40,6 +42,8 @@ test('calls console methods', () => {
   expect(traceSpy).toHaveBeenNthCalledWith(1, 'aaa_trace');
   expect(debugSpy).toHaveBeenCalledTimes(1);
   expect(debugSpy).toHaveBeenNthCalledWith(1, 'aaa_debug');
-  expect(logSpy).toHaveBeenCalledTimes(1);
-  expect(logSpy).toHaveBeenNthCalledWith(1, 'aaa_info');
+  expect(infoSpy).toHaveBeenCalledTimes(1);
+  expect(infoSpy).toHaveBeenNthCalledWith(1, 'aaa_info');
+
+  expect(logSpy).not.toHaveBeenCalled();
 });

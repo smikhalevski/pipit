@@ -1,4 +1,4 @@
-import { LogMessage, LogProcessor } from '../LoggerChannel.js';
+import type { LogMessage, LogProcessor } from '../types.js';
 
 /**
  * Excludes messages that have an insufficient severity level.

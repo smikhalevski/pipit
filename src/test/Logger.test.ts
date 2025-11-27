@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest';
-import { Logger, LoggerChannel, Level } from '../main/index.js';
+import { Level, Logger } from '../main/index.js';
 
 vi.useFakeTimers();
 
@@ -8,7 +8,7 @@ test('creates a new logger', () => {
 
   expect(logger.level).toBe(0);
   expect(logger.context).toBe(undefined);
-  expect(logger.channels.length).toBe(0);
+  expect(logger['_channels'].length).toBe(0);
   expect(logger.isTraceEnabled).toBe(true);
   expect(logger.isDebugEnabled).toBe(true);
   expect(logger.isInfoEnabled).toBe(true);
@@ -22,27 +22,13 @@ test('creates a new logger with a log level', () => {
 
   expect(logger.level).toBe(Level.ERROR);
   expect(logger.context).toBe(undefined);
-  expect(logger.channels.length).toBe(0);
+  expect(logger['_channels'].length).toBe(0);
   expect(logger.isTraceEnabled).toBe(false);
   expect(logger.isDebugEnabled).toBe(false);
   expect(logger.isInfoEnabled).toBe(false);
   expect(logger.isWarnEnabled).toBe(false);
   expect(logger.isErrorEnabled).toBe(true);
   expect(logger.isFatalEnabled).toBe(true);
-});
-
-test('appends a channel', () => {
-  const logger = new Logger();
-
-  const channel1 = logger.openChannel();
-  const channel2 = logger.openChannel();
-
-  expect(channel1).toBeInstanceOf(LoggerChannel);
-  expect(channel2).toBeInstanceOf(LoggerChannel);
-
-  expect(logger.channels.length).toBe(2);
-  expect(logger.channels[0]).toBe(channel1);
-  expect(logger.channels[1]).toBe(channel2);
 });
 
 test('dispatches an info message', () => {
@@ -72,8 +58,8 @@ test('dispatches message to all channels', () => {
   const processorMock2 = vi.fn();
   const logger = new Logger();
 
-  logger.openChannel().to(processorMock1);
-  logger.openChannel().to(processorMock2);
+  logger.addChannel(processorMock1);
+  logger.addChannel(processorMock2);
 
   logger.info('aaa');
 
@@ -95,7 +81,7 @@ test('does not dispatch message if level is insufficient', () => {
   const processorMock = vi.fn();
   const logger = new Logger(Level.ERROR);
 
-  logger.openChannel().to(processorMock);
+  logger.addChannel(processorMock);
 
   logger.info('aaa');
 
@@ -112,7 +98,7 @@ test('attaches logger context', () => {
 
   logger.context = 111;
 
-  logger.openChannel().to(processorMock);
+  logger.addChannel(processorMock);
 
   logger.info('aaa');
 
@@ -133,8 +119,8 @@ test('invokes all channels and re-throws the first error', () => {
   });
   const logger = new Logger();
 
-  logger.openChannel().to(processorMock1);
-  logger.openChannel().to(processorMock2);
+  logger.addChannel(processorMock1);
+  logger.addChannel(processorMock2);
 
   expect(() => logger.info('aaa')).not.toThrow();
 
@@ -143,3 +129,71 @@ test('invokes all channels and re-throws the first error', () => {
 
   expect(() => vi.runAllTimers()).toThrow(new Error('expected1'));
 });
+
+test('does not fail if there are no processors', () => {
+  new Logger().dispatch(0, ['aaa']);
+});
+
+test('does not fail if the last processor invokes next', () => {
+  const logger = new Logger().addChannel((messages, next) => {
+    next(messages);
+  });
+
+  logger.dispatch(0, ['aaa']);
+});
+
+test('invokes a processor', () => {
+  const logger = new Logger();
+  const processorMock = vi.fn();
+
+  logger.addChannel(processorMock);
+
+  logger.dispatch(0, ['aaa']);
+
+  expect(processorMock).toHaveBeenCalledTimes(1);
+  expect(processorMock).toHaveBeenNthCalledWith(
+    1,
+    [{ level: 0, args: ['aaa'], context: undefined }],
+    expect.any(Function)
+  );
+});
+
+// test('invokes another channel', () => {
+//   const channel1 = new LoggerChannel();
+//   const channel2 = new LoggerChannel();
+//   const processorMock = vi.fn();
+//
+//   const dispatchSpy = vi.spyOn(channel2, 'dispatch');
+//
+//   channel1.to(channel2).to(processorMock);
+//
+//   channel1.dispatch(0, ['aaa'], 111);
+//
+//   expect(dispatchSpy).toHaveBeenCalledTimes(1);
+//   expect(dispatchSpy).toHaveBeenNthCalledWith(1, 0, ['aaa'], 111);
+//   expect(processorMock).toHaveBeenCalledTimes(1);
+//   expect(processorMock).toHaveBeenNthCalledWith(1, [{ level: 0, args: ['aaa'], context: 111 }], expect.any(Function));
+// });
+//
+// test('a processor can invoke the next processor', () => {
+//   const channel = new LoggerChannel();
+//   const processorMock1 = vi.fn((_messages, next) => next([{ level: 111, args: ['bbb'], context: 222 }]));
+//   const processorMock2 = vi.fn();
+//
+//   channel.to(processorMock1).to(processorMock2);
+//
+//   channel.dispatch(0, ['aaa']);
+//
+//   expect(processorMock1).toHaveBeenCalledTimes(1);
+//   expect(processorMock1).toHaveBeenNthCalledWith(
+//     1,
+//     [{ level: 0, args: ['aaa'], context: undefined }],
+//     expect.any(Function)
+//   );
+//   expect(processorMock2).toHaveBeenCalledTimes(1);
+//   expect(processorMock2).toHaveBeenNthCalledWith(
+//     1,
+//     [{ level: 111, args: ['bbb'], context: 222 }],
+//     expect.any(Function)
+//   );
+// });

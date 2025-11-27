@@ -1,5 +1,5 @@
-import { LogProcessor } from '../LoggerChannel.js';
 import { inspect } from '../inspect.js';
+import type { LogProcessor } from '../types.js';
 
 /**
  * Prepends args to each message and passes them to the next processor.

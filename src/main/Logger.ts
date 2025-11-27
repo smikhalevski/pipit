@@ -1,5 +1,5 @@
 import { Level } from './Level.js';
-import { LogDispatcher, LoggerChannel } from './LoggerChannel.js';
+import type { LogDispatcher, LogMessage, LogProcessor } from './types.js';
 
 /**
  * Dispatches logged messages to channels.
@@ -8,7 +8,7 @@ export class Logger implements LogDispatcher {
   /**
    * The list of channels.
    */
-  channels: LoggerChannel[] = [];
+  protected _channels: LogProcessor[][] = [];
 
   /**
    * Creates the new {@link Logger} instance.
@@ -43,29 +43,6 @@ export class Logger implements LogDispatcher {
 
   get isFatalEnabled(): boolean {
     return this.level <= Level.FATAL;
-  }
-
-  /**
-   * Deletes all channels from the logger and resets the log level.
-   *
-   * @param level The new log level.
-   * @returns This logger instance.
-   */
-  reset(level = 0): this {
-    this.level = level;
-    this.channels = [];
-    return this;
-  }
-
-  /**
-   * Creates a new channel and appends it to this logger.
-   */
-  openChannel(): LoggerChannel {
-    const channel = new LoggerChannel();
-
-    this.channels.push(channel);
-
-    return channel;
   }
 
   /**
@@ -115,15 +92,63 @@ export class Logger implements LogDispatcher {
    */
   log = this.info;
 
+  /**
+   * Deletes all channels from the logger and resets the log level.
+   *
+   * @param level The new log level.
+   */
+  reset(level = 0): this {
+    this._channels = [];
+    this.level = level;
+
+    return this;
+  }
+
+  /**
+   * Creates a new channel and appends it to this logger.
+   *
+   * @param processors Processors that are added to a channel.
+   */
+  addChannel(...processors: Array<LogProcessor | LogDispatcher>): this;
+
+  addChannel() {
+    const channel: LogProcessor[] = [];
+
+    for (let i = 0; i < arguments.length; ++i) {
+      if (typeof arguments[i] === 'function') {
+        channel.push(arguments[i]);
+        continue;
+      }
+
+      const dispatcher: LogDispatcher = arguments[i];
+
+      channel.push((messages, next) => {
+        for (const message of messages) {
+          dispatcher.dispatch(message.level, message.args, message.context);
+        }
+        next(messages);
+      });
+    }
+
+    this._channels.push(channel);
+
+    return this;
+  }
+
   dispatch(level: number, args: any[], context = this.context): void {
-    if (this.level > level) {
+    if (level < this.level) {
       return;
     }
 
-    for (const channel of this.channels) {
+    for (const channel of this._channels) {
+      if (channel.length === 0) {
+        continue;
+      }
+
       try {
-        channel.dispatch(level, args, context);
+        callProcessor(channel, 0, [{ level, args, context }]);
       } catch (error) {
+        // Unhandled error
         setTimeout(() => {
           throw error;
         }, 0);
@@ -131,3 +156,12 @@ export class Logger implements LogDispatcher {
     }
   }
 }
+
+function callProcessor(processors: LogProcessor[], index: number, messages: LogMessage[]): void {
+  processors[index](
+    messages,
+    ++index === processors.length ? noop : messages => callProcessor(processors, index, messages)
+  );
+}
+
+function noop() {}

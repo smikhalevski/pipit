@@ -12,7 +12,7 @@
     "./preprocessor/prepend": "./preprocessor/prepend.js",
     "./preprocessor/prependTimestamp": "./preprocessor/prependTimestamp.js",
     "./preprocessor/prependLevel": "./preprocessor/prependLevel.js",
-    "./preprocessor/printToConsole": "./preprocessor/printToConsole.js",
+    "./preprocessor/writeToConsole": "./preprocessor/writeToConsole.js",
     "./preprocessor/sendToSentry": "./preprocessor/sendToSentry.js",
     "./package.json": "./package.json"
   },

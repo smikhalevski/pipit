@@ -1,5 +1,6 @@
 import { Level } from '../Level.js';
-import { LogProcessor } from '../LoggerChannel.js';
+
+import type { LogProcessor } from '../types.js';
 
 /**
  * Writes messages to console.
