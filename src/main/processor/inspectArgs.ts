@@ -7,7 +7,7 @@ import type { LogProcessor } from '../types.js';
  * @returns The processor callback.
  */
 export default function inspectArgs(): LogProcessor {
-  return (messages, next) => {
+  return _logger => (messages, next) => {
     for (const message of messages) {
       message.args = message.args.map(arg => inspect(arg));
     }

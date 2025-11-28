@@ -1,3 +1,9 @@
+import type { Logger } from './Logger.js';
+
+export interface LoggerEvent {
+  type: string;
+}
+
 /**
  * The logged message.
  */
@@ -18,22 +24,12 @@ export interface LogMessage {
   context: any;
 }
 
+export type LogMessageHandler = (messages: LogMessage[], next: (messages: LogMessage[]) => void) => void;
+
 /**
  * Processes messages and passes updated messages to the next processor.
  *
  * @param messages The array of messages to process.
  * @param next Invokes the next processor in the sequence or no-op if there's no more processors.
  */
-export type LogProcessor = (messages: LogMessage[], next: (messages: LogMessage[]) => void) => void;
-
-/**
- * Dispatches a logged message.
- */
-export interface LogDispatcher {
-  /**
-   * @param level The message severity level.
-   * @param args The array of arguments.
-   * @param context The optional message context.
-   */
-  dispatch(level: number, args: any[], context?: any): void;
-}
+export type LogProcessor = (logger: Logger) => LogMessageHandler;

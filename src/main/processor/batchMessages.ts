@@ -30,36 +30,54 @@ export default function batchMessages(options: BatchMessagesOptions = {}): LogPr
 
   let batch: LogMessage[] = [];
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let batchNext: any;
 
-  return (messages, next) => {
-    if (timeout === -1 && limit === -1) {
-      next(messages);
-      return;
-    }
+  return logger => {
+    logger.subscribe(event => {
+      if (event.type !== 'flush' || batchNext === undefined || batch.length === 0) {
+        return;
+      }
 
-    batch.push(...messages);
-
-    if (limit !== -1 && batch.length >= limit) {
-      messages = batch;
+      const messages = batch;
 
       batch = [];
       clearTimeout(timer);
 
-      next(messages);
-      return;
-    }
+      batchNext(messages);
+    });
 
-    if (timeout === -1 || timer !== undefined) {
-      return;
-    }
+    return (messages, next) => {
+      batchNext = next;
 
-    timer = setTimeout(() => {
-      const messages = batch;
+      if (timeout === -1 && limit === -1) {
+        next(messages);
+        return;
+      }
 
-      batch = [];
-      timer = undefined;
+      batch.push(...messages);
 
-      next(messages);
-    }, timeout);
+      if (limit !== -1 && batch.length >= limit) {
+        messages = batch;
+
+        batch = [];
+        clearTimeout(timer);
+
+        next(messages);
+        return;
+      }
+
+      if (timeout === -1 || timer !== undefined) {
+        return;
+      }
+
+      timer = setTimeout(() => {
+        const messages = batch;
+
+        batch = [];
+        timer = undefined;
+
+        next(messages);
+      }, timeout);
+    };
   };
 }

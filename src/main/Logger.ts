@@ -1,14 +1,17 @@
+import { PubSub } from 'parallel-universe';
 import { Level } from './Level.js';
-import type { LogDispatcher, LogMessage, LogProcessor } from './types.js';
+import type { LoggerEvent, LogMessage, LogMessageHandler, LogProcessor } from './types.js';
 
 /**
  * Dispatches logged messages to channels.
  */
-export class Logger implements LogDispatcher {
+export class Logger {
   /**
    * The list of channels.
    */
-  protected _channels: LogProcessor[][] = [];
+  protected _channels: LogMessageHandler[][] = [];
+
+  protected _pubSub = new PubSub<LoggerEvent>();
 
   /**
    * Creates the new {@link Logger} instance.
@@ -49,42 +52,42 @@ export class Logger implements LogDispatcher {
    * Log a finer-grained informational message than the {@link debug}, usually with a stack trace.
    */
   trace = (...args: any[]): void => {
-    this.dispatch(Level.TRACE, args);
+    this._dispatch(Level.TRACE, args);
   };
 
   /**
    * Log a fine-grained informational message that are most useful to debug an application.
    */
   debug = (...args: any[]): void => {
-    this.dispatch(Level.DEBUG, args);
+    this._dispatch(Level.DEBUG, args);
   };
 
   /**
    * Log an informational message that highlight the progress of the application at coarse-grained level.
    */
   info = (...args: any[]): void => {
-    this.dispatch(Level.INFO, args);
+    this._dispatch(Level.INFO, args);
   };
 
   /**
    * Log a potentially harmful situation.
    */
   warn = (...args: any[]): void => {
-    this.dispatch(Level.WARN, args);
+    this._dispatch(Level.WARN, args);
   };
 
   /**
    * Log an error event that might still allow the application to continue running.
    */
   error = (...args: any[]): void => {
-    this.dispatch(Level.ERROR, args);
+    this._dispatch(Level.ERROR, args);
   };
 
   /**
    * Log a very severe error events that will presumably lead the application to abort.
    */
   fatal = (...args: any[]): void => {
-    this.dispatch(Level.FATAL, args);
+    this._dispatch(Level.FATAL, args);
   };
 
   /**
@@ -109,25 +112,17 @@ export class Logger implements LogDispatcher {
    *
    * @param processors Processors that are added to a channel.
    */
-  addChannel(...processors: Array<LogProcessor | LogDispatcher>): this;
+  addChannel(...processors: LogProcessor[]): this;
 
   addChannel() {
-    const channel: LogProcessor[] = [];
+    if (arguments.length === 0) {
+      return this;
+    }
+
+    const channel = [];
 
     for (let i = 0; i < arguments.length; ++i) {
-      if (typeof arguments[i] === 'function') {
-        channel.push(arguments[i]);
-        continue;
-      }
-
-      const dispatcher: LogDispatcher = arguments[i];
-
-      channel.push((messages, next) => {
-        for (const message of messages) {
-          dispatcher.dispatch(message.level, message.args, message.context);
-        }
-        next(messages);
-      });
+      channel.push((0, arguments[i])(this));
     }
 
     this._channels.push(channel);
@@ -135,7 +130,19 @@ export class Logger implements LogDispatcher {
     return this;
   }
 
-  dispatch(level: number, args: any[], context = this.context): void {
+  flush(): void {
+    this._publish({ type: 'flush' });
+  }
+
+  subscribe(listener: (event: LoggerEvent) => void): () => void {
+    return this._pubSub.subscribe(listener);
+  }
+
+  protected _publish(event: LoggerEvent): void {
+    this._pubSub.publish(event);
+  }
+
+  protected _dispatch(level: number, args: any[], context = this.context): void {
     if (level < this.level) {
       return;
     }
@@ -146,7 +153,7 @@ export class Logger implements LogDispatcher {
       }
 
       try {
-        callProcessor(channel, 0, [{ level, args, context }]);
+        handleMessage(channel, 0, [{ level, args, context }]);
       } catch (error) {
         // Unhandled error
         setTimeout(() => {
@@ -157,11 +164,8 @@ export class Logger implements LogDispatcher {
   }
 }
 
-function callProcessor(processors: LogProcessor[], index: number, messages: LogMessage[]): void {
-  processors[index](
-    messages,
-    ++index === processors.length ? noop : messages => callProcessor(processors, index, messages)
-  );
+function handleMessage(channel: LogMessageHandler[], index: number, messages: LogMessage[]): void {
+  channel[index](messages, ++index === channel.length ? noop : messages => handleMessage(channel, index, messages));
 }
 
 function noop() {}

@@ -7,7 +7,7 @@ import type { LogProcessor } from '../types.js';
  * @returns The processor callback.
  */
 export default function prependLevel(): LogProcessor {
-  return (messages, next) => {
+  return _logger => (messages, next) => {
     for (const message of messages) {
       message.args.unshift(getLevelLabel(message.level));
     }

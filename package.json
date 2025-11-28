@@ -43,5 +43,8 @@
     "typedoc": "^0.28.14",
     "typescript": "^5.9.3",
     "vitest": "^4.0.10"
+  },
+  "dependencies": {
+    "parallel-universe": "^6.1.2"
   }
 }

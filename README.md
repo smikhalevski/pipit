@@ -6,10 +6,6 @@
 
 The universal logger with the pluggable architecture.
 
-```ts
-logger.addChannel(stringifyJSON(), writeToConsole());
-```
-
 ```sh
 npm install --save-prod pipit
 ```

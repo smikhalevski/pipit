@@ -3,7 +3,7 @@ import writeToConsole from './processor/writeToConsole.js';
 
 export { Level } from './Level.js';
 export { Logger } from './Logger.js';
-export type { LogDispatcher, LogProcessor, LogMessage } from './types.js';
+export type { LogProcessor, LogMessage } from './types.js';
 
 /**
  * The default global logger.

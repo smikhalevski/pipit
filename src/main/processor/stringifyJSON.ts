@@ -7,7 +7,7 @@ import type { LogProcessor } from '../types.js';
  * @returns The processor callback.
  */
 export default function stringifyJSON(): LogProcessor {
-  return (messages, next) => {
+  return _logger => (messages, next) => {
     const timestamp = new Date().toISOString();
 
     for (const message of messages) {
