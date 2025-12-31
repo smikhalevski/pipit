@@ -17,7 +17,7 @@ interface SentryClient {
  * @returns The processor callback.
  */
 export default function sendToSentry(client: SentryClient): LogProcessor {
-  return _logger => (messages, next) => {
+  return () => (messages, next) => {
     for (const message of messages) {
       if (message.level >= Level.ERROR) {
         client.captureException(message.args[0]);

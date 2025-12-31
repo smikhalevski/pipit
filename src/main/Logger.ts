@@ -1,15 +1,25 @@
 import { PubSub } from 'parallel-universe';
 import { Level } from './Level.js';
-import type { LoggerEvent, LogMessage, LogMessageHandler, LogProcessor } from './types.js';
+import type { LoggerEvent, LogMessage, LogMessagesHandler, LogProcessor } from './types.js';
 
 /**
  * Dispatches logged messages to channels.
  */
-export class Logger {
+export class Logger<Args extends any[] = any[], Context = any> {
+  /**
+   * The minimum log level of messages that would be dispatched to channels.
+   */
+  level: number;
+
+  /**
+   * The context that is added to dispatched messages.
+   */
+  context: Context;
+
   /**
    * The list of channels.
    */
-  protected _channels: LogMessageHandler[][] = [];
+  protected _channels: Array<(messages: LogMessage[]) => void> = [];
 
   protected _pubSub = new PubSub<LoggerEvent>();
 
@@ -17,12 +27,22 @@ export class Logger {
    * Creates the new {@link Logger} instance.
    *
    * @param level The minimum log level of messages that would be dispatched to channels.
+   *
+   */
+  constructor(level?: number);
+
+  /**
+   * Creates the new {@link Logger} instance.
+   *
+   * @param level The minimum log level of messages that would be dispatched to channels.
    * @param context The context that is added to dispatched messages.
    */
-  constructor(
-    public level = 0,
-    public context?: any
-  ) {}
+  constructor(level: number, context: Context);
+
+  constructor(level = 0, context?: any) {
+    this.level = level;
+    this.context = context;
+  }
 
   get isTraceEnabled(): boolean {
     return this.level <= Level.TRACE;
@@ -51,58 +71,76 @@ export class Logger {
   /**
    * Log a finer-grained informational message than the {@link debug}, usually with a stack trace.
    */
-  trace = (...args: any[]): void => {
-    this._dispatch(Level.TRACE, args);
+  trace = (...args: Args): void => {
+    if (this.isTraceEnabled) {
+      dispatch(this._channels, Level.TRACE, args, this.context);
+    }
   };
 
   /**
    * Log a fine-grained informational message that are most useful to debug an application.
    */
-  debug = (...args: any[]): void => {
-    this._dispatch(Level.DEBUG, args);
+  debug = (...args: Args): void => {
+    if (this.isDebugEnabled) {
+      dispatch(this._channels, Level.DEBUG, args, this.context);
+    }
   };
 
   /**
    * Log an informational message that highlight the progress of the application at coarse-grained level.
    */
-  info = (...args: any[]): void => {
-    this._dispatch(Level.INFO, args);
+  info = (...args: Args): void => {
+    if (this.isInfoEnabled) {
+      dispatch(this._channels, Level.INFO, args, this.context);
+    }
   };
 
   /**
    * Log a potentially harmful situation.
    */
-  warn = (...args: any[]): void => {
-    this._dispatch(Level.WARN, args);
+  warn = (...args: Args): void => {
+    if (this.isWarnEnabled) {
+      dispatch(this._channels, Level.WARN, args, this.context);
+    }
   };
 
   /**
    * Log an error event that might still allow the application to continue running.
    */
-  error = (...args: any[]): void => {
-    this._dispatch(Level.ERROR, args);
+  error = (...args: Args): void => {
+    if (this.isErrorEnabled) {
+      dispatch(this._channels, Level.ERROR, args, this.context);
+    }
   };
 
   /**
    * Log a very severe error events that will presumably lead the application to abort.
    */
-  fatal = (...args: any[]): void => {
-    this._dispatch(Level.FATAL, args);
+  fatal = (...args: Args): void => {
+    if (this.isFatalEnabled) {
+      dispatch(this._channels, Level.FATAL, args, this.context);
+    }
   };
 
   /**
+   * Log an informational message that highlight the progress of the application at coarse-grained level.
+   *
    * The alias for {@link info}.
    */
   log = this.info;
 
   /**
-   * Deletes all channels from the logger and resets the log level.
+   * Removes all channels, unsubscribes all subscribers, and resets the log level.
    *
    * @param level The new log level.
+   * @param context
    */
-  reset(level = 0): this {
-    this._channels = [];
+  reset(level = this.level, context = this.context): this {
     this.level = level;
+    this.context = context;
+
+    this._channels = [];
+    this._pubSub.unsubscribeAll();
 
     return this;
   }
@@ -119,10 +157,13 @@ export class Logger {
       return this;
     }
 
-    const channel = [];
+    let channel: (messages: LogMessage[]) => void = noop;
 
-    for (let i = 0; i < arguments.length; ++i) {
-      channel.push((0, arguments[i])(this));
+    for (let i = arguments.length; i-- > 0; ) {
+      const handler: LogMessagesHandler = (0, arguments[i])(this);
+      const next = channel;
+
+      channel = messages => handler(messages, next);
     }
 
     this._channels.push(channel);
@@ -130,42 +171,34 @@ export class Logger {
     return this;
   }
 
+  /**
+   * Notifies processors that all messages that are not yet dispatched, should be dispatched immediatelly.
+   */
   flush(): void {
-    this._publish({ type: 'flush' });
+    this.publish({ type: 'flush' });
   }
 
   subscribe(listener: (event: LoggerEvent) => void): () => void {
     return this._pubSub.subscribe(listener);
   }
 
-  protected _publish(event: LoggerEvent): void {
+  publish(event: LoggerEvent): void {
     this._pubSub.publish(event);
   }
+}
 
-  protected _dispatch(level: number, args: any[], context = this.context): void {
-    if (level < this.level) {
-      return;
-    }
-
-    for (const channel of this._channels) {
-      if (channel.length === 0) {
-        continue;
-      }
-
-      try {
-        handleMessage(channel, 0, [{ level, args, context }]);
-      } catch (error) {
-        // Unhandled error
-        setTimeout(() => {
-          throw error;
-        }, 0);
-      }
+function dispatch(channels: Array<(messages: LogMessage[]) => void>, level: number, args: any[], context: any): void {
+  for (const channel of channels) {
+    try {
+      channel([{ timestamp: Date.now(), level, args, context }]);
+    } catch (error) {
+      setTimeout(die, 0, error);
     }
   }
 }
 
-function handleMessage(channel: LogMessageHandler[], index: number, messages: LogMessage[]): void {
-  channel[index](messages, ++index === channel.length ? noop : messages => handleMessage(channel, index, messages));
+function die(error: unknown): never {
+  throw error;
 }
 
-function noop() {}
+function noop(): void {}

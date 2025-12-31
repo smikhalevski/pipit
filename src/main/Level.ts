@@ -1,19 +1,19 @@
 /**
- * The well-known logging levels.
+ * Well-known logging levels.
  */
 export const Level = {
   /**
-   * Designates finer-grained informational events than the {@link DEBUG}, usually with a stack trace.
+   * Designates finer-grained informational events than {@link DEBUG}, usually including a stack trace.
    */
   TRACE: 100,
 
   /**
-   * Designates fine-grained informational events that are most useful to debug an application.
+   * Designates fine-grained informational events that are most useful for debugging an application.
    */
   DEBUG: 200,
 
   /**
-   * Designates informational messages that highlight the progress of the application at coarse-grained level.
+   * Designates informational messages that highlight the progress of an application at a coarse-grained level.
    */
   INFO: 300,
 
@@ -33,7 +33,7 @@ export const Level = {
   FATAL: 600,
 
   /**
-   * The highest possible rank and is intended to turn off logging.
+   * The highest possible level; intended to turn off logging.
    */
   OFF: Infinity,
 } as const;

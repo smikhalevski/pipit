@@ -5,14 +5,18 @@ import type { LogMessage, LogProcessor } from '../types.js';
  */
 export interface BatchMessagesOptions {
   /**
-   * The timeout in milliseconds between the first and the last message in the batchMessages. If -1 then timeout is ignored.
+   * The timeout in milliseconds between the first and the last message in the batchMessages.
+   *
+   * If < 0 then no batching is done.
    *
    * @default 100
    */
   timeout?: number;
 
   /**
-   * The maximum number of buffered messages. If -1 then limit is ignored.
+   * The maximum number of buffered messages.
+   *
+   * If < 2 then no batching is done.
    *
    * @default 50
    */
@@ -28,56 +32,41 @@ export interface BatchMessagesOptions {
 export default function batchMessages(options: BatchMessagesOptions = {}): LogProcessor {
   const { timeout = 100, limit = 50 } = options;
 
-  let batch: LogMessage[] = [];
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  let batchNext: any;
+  if (timeout < 0 || limit < 2) {
+    return () => (messages, next) => next(messages);
+  }
 
   return logger => {
-    logger.subscribe(event => {
-      if (event.type !== 'flush' || batchNext === undefined || batch.length === 0) {
-        return;
-      }
+    let cachedMessages: LogMessage[] = [];
+    let cachedNext: ((messages: LogMessage[]) => void) | undefined;
+    let timer: number | undefined;
 
-      const messages = batch;
+    const flush = (): void => {
+      const messages = cachedMessages;
+      const next = cachedNext;
 
-      batch = [];
       clearTimeout(timer);
+      cachedNext = timer = undefined;
 
-      batchNext(messages);
+      cachedMessages = [];
+      next?.(messages);
+    };
+
+    logger.subscribe(event => {
+      if (event.type === 'flush') {
+        flush();
+      }
     });
 
     return (messages, next) => {
-      batchNext = next;
+      cachedMessages.push(...messages);
+      cachedNext = next;
 
-      if (timeout === -1 && limit === -1) {
-        next(messages);
-        return;
+      if (cachedMessages.length >= limit) {
+        flush();
+      } else if (timer === undefined) {
+        timer = setTimeout(flush, timeout);
       }
-
-      batch.push(...messages);
-
-      if (limit !== -1 && batch.length >= limit) {
-        messages = batch;
-
-        batch = [];
-        clearTimeout(timer);
-
-        next(messages);
-        return;
-      }
-
-      if (timeout === -1 || timer !== undefined) {
-        return;
-      }
-
-      timer = setTimeout(() => {
-        const messages = batch;
-
-        batch = [];
-        timer = undefined;
-
-        next(messages);
-      }, timeout);
     };
   };
 }

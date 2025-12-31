@@ -1,14 +1,16 @@
 import { expect, test, vi } from 'vitest';
-import { Level } from '../../main/index.js';
+import { Level, Logger } from '../../main/index.js';
 import sendToSentry from '../../main/processor/sendToSentry.js';
 
 test('sends exceptions', () => {
   const nextMock = vi.fn();
   const captureMessageMock = vi.fn();
   const captureExceptionMock = vi.fn();
-  const processor = sendToSentry({ captureException: captureExceptionMock, captureMessage: captureMessageMock });
+  const handler = sendToSentry({ captureException: captureExceptionMock, captureMessage: captureMessageMock })(
+    new Logger()
+  );
 
-  processor([{ level: Level.ERROR, args: ['aaa'], context: undefined }], nextMock);
+  handler([{ timestamp: 0, level: Level.ERROR, args: ['aaa'], context: undefined }], nextMock);
 
   expect(captureMessageMock).not.toHaveBeenCalled();
   expect(captureExceptionMock).toHaveBeenCalledTimes(1);
@@ -19,9 +21,11 @@ test('sends messages', () => {
   const nextMock = vi.fn();
   const captureMessageMock = vi.fn();
   const captureExceptionMock = vi.fn();
-  const processor = sendToSentry({ captureException: captureExceptionMock, captureMessage: captureMessageMock });
+  const handler = sendToSentry({ captureException: captureExceptionMock, captureMessage: captureMessageMock })(
+    new Logger()
+  );
 
-  processor([{ level: Level.INFO, args: ['aaa'], context: undefined }], nextMock);
+  handler([{ timestamp: 0, level: Level.INFO, args: ['aaa'], context: undefined }], nextMock);
 
   expect(captureExceptionMock).not.toHaveBeenCalled();
   expect(captureMessageMock).toHaveBeenCalledTimes(1);

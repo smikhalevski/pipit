@@ -21,10 +21,11 @@ npm install --save-prod pipit
 - [`batchMessages`](#batchmessages)
 - [`levelCutoff`](#levelcutoff)
 - [`prependArgs`](#prependargs)
-- [`prependTimestamp`](#prependtimestamp)
 - [`prependLevel`](#prependlevel)
-- [`writeToConsole`](#writetoconsole)
+- [`prependTimestamp`](#prependtimestamp)
 - [`sendToSentry`](#sendtosentry)
+- [`stringifyJSON`](#stringifyjson)
+- [`writeToConsole`](#writetoconsole)
 
 # Usage
 
@@ -141,7 +142,7 @@ To showcase how processors work, let's create a basic processor that prepends a 
 import { Logger, LogProcessor } from 'pipit';
 import writeToConsole from 'pipit/processor/writeToConsole';
 
-const myLogProcessor: LogProcessor = (messages, next) => {
+const myLogProcessor: LogProcessor = logger => (messages, next) => {
   const date = new Date().toISOString();
 
   for (const message of messages) {
@@ -225,20 +226,6 @@ myLogger.log('Boss');
 // ⮕ 'Hello, Boss'
 ```
 
-# `prependTimestamp`
-
-Prepends date and time in ISO format to each message.
-
-```ts
-import prependTimestamp from 'pipit/processor/prependTimestamp';
-import writeToConsole from 'pipit/processor/writeToConsole';
-
-myLogger.addChannel(prependTimestamp(), writeToConsole());
-
-myLogger.log('Okay, cowboy');
-// ⮕ '2022-11-25T16:59:44.286Z Okay, cowboy'
-```
-
 # `prependLevel`
 
 Prepends severity level label to each message.
@@ -253,17 +240,18 @@ myLogger.fatal('No way!');
 // ⮕ 'FATAL No way
 ```
 
-# `writeToConsole`
+# `prependTimestamp`
 
-Prints messages to the console.
+Prepends date and time in ISO format to each message.
 
 ```ts
+import prependTimestamp from 'pipit/processor/prependTimestamp';
 import writeToConsole from 'pipit/processor/writeToConsole';
 
-myLogger.addChannel(writeToConsole());
+myLogger.addChannel(prependTimestamp(), writeToConsole());
 
-myLogger.log('Okay');
-// ⮕ 'Okay'
+myLogger.log('Okay, cowboy');
+// ⮕ '2022-11-25T16:59:44.286Z Okay, cowboy'
 ```
 
 # `sendToSentry`
@@ -279,4 +267,32 @@ logger.addChannel(sendToSentry(Sentry));
 
 logger.log('To the moon!');
 // Prints message to console and sends it to Sentry
+```
+
+# `stringifyJSON`
+
+Squashes message arguments into an object.
+
+```ts
+import logger from 'pipit';
+import stringifyJSON from 'pipit/processor/stringifyJSON';
+import * as Sentry from '@sentry/browser';
+
+logger.addChannel(stringifyJSON());
+
+logger.log('To the moon!');
+// {"timestamp":1767277876893,"level":"info","message":"To the moon!"}
+```
+
+# `writeToConsole`
+
+Prints messages to the console.
+
+```ts
+import writeToConsole from 'pipit/processor/writeToConsole';
+
+myLogger.addChannel(writeToConsole());
+
+myLogger.log('Okay');
+// ⮕ 'Okay'
 ```

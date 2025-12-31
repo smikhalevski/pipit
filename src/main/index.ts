@@ -3,11 +3,13 @@ import writeToConsole from './processor/writeToConsole.js';
 
 export { Level } from './Level.js';
 export { Logger } from './Logger.js';
-export type { LogProcessor, LogMessage } from './types.js';
+export type { LoggerEvent, LogMessage, LogMessagesHandler, LogProcessor } from './types.js';
+
+const logger = new Logger().addChannel(writeToConsole());
 
 /**
  * The default global logger.
  *
  * By default, writes all messages to console.
  */
-export default new Logger().addChannel(writeToConsole());
+export default logger;

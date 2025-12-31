@@ -9,7 +9,7 @@ import type { LogMessage, LogProcessor } from '../types.js';
 export default function levelCutoff(level: number): LogProcessor {
   const filter = (message: LogMessage) => message.level >= level;
 
-  return _logger => (messages, next) => {
+  return () => (messages, next) => {
     next(messages.every(filter) ? messages : messages.filter(filter));
   };
 }

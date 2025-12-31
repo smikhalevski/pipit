@@ -6,8 +6,8 @@ import type { LogProcessor } from '../types.js';
  * @param args The args to prependArgs.
  * @returns The processor callback.
  */
-export default function prependArgs(...args: unknown[]): LogProcessor {
-  return _logger => (messages, next) => {
+export default function prependArgs(...args: readonly any[]): LogProcessor {
+  return () => (messages, next) => {
     for (const message of messages) {
       message.args.unshift(...args);
     }

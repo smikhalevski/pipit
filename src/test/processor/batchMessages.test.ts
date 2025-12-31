@@ -1,34 +1,35 @@
 import { expect, test, vi } from 'vitest';
 import batchMessages from '../../main/processor/batchMessages.js';
+import { Logger } from '../../main/index.js';
 
 vi.useFakeTimers();
 
 test('batches messages using limit strategy', () => {
   const nextMock = vi.fn();
-  const processor = batchMessages({ timeout: -1, limit: 2 });
+  const handler = batchMessages({ timeout: 0, limit: 2 })(new Logger());
 
-  processor([{ level: 0, args: ['aaa'], context: undefined }], nextMock);
+  handler([{ timestamp: 0, level: 0, args: ['aaa'], context: undefined }], nextMock);
 
   expect(nextMock).not.toHaveBeenCalled();
 
-  processor([{ level: 0, args: ['bbb'], context: undefined }], nextMock);
+  handler([{ timestamp: 0, level: 0, args: ['bbb'], context: undefined }], nextMock);
 
   expect(nextMock).toHaveBeenCalledTimes(1);
   expect(nextMock).toHaveBeenNthCalledWith(1, [
-    { level: 0, args: ['aaa'], context: undefined },
-    { level: 0, args: ['bbb'], context: undefined },
+    { timestamp: 0, level: 0, args: ['aaa'], context: undefined },
+    { timestamp: 0, level: 0, args: ['bbb'], context: undefined },
   ]);
 });
 
 test('batches messages using timeout strategy', () => {
   const nextMock = vi.fn();
-  const processor = batchMessages({ timeout: 10, limit: -1 });
+  const handler = batchMessages({ timeout: 10, limit: Infinity })(new Logger());
 
-  processor([{ level: 0, args: ['aaa'], context: undefined }], nextMock);
+  handler([{ timestamp: 0, level: 0, args: ['aaa'], context: undefined }], nextMock);
 
   expect(nextMock).not.toHaveBeenCalled();
 
-  processor([{ level: 0, args: ['bbb'], context: undefined }], nextMock);
+  handler([{ timestamp: 0, level: 0, args: ['bbb'], context: undefined }], nextMock);
 
   expect(nextMock).not.toHaveBeenCalled();
 
@@ -36,7 +37,29 @@ test('batches messages using timeout strategy', () => {
 
   expect(nextMock).toHaveBeenCalledTimes(1);
   expect(nextMock).toHaveBeenNthCalledWith(1, [
-    { args: ['aaa'], context: undefined, level: 0 },
-    { args: ['bbb'], context: undefined, level: 0 },
+    { timestamp: 0, level: 0, args: ['aaa'], context: undefined },
+    { timestamp: 0, level: 0, args: ['bbb'], context: undefined },
+  ]);
+});
+
+test('flushes messages prematurely', () => {
+  const nextMock = vi.fn();
+  const logger = new Logger();
+  const handler = batchMessages({ timeout: 10, limit: Infinity })(logger);
+
+  handler([{ timestamp: 0, level: 0, args: ['aaa'], context: undefined }], nextMock);
+
+  expect(nextMock).not.toHaveBeenCalled();
+
+  handler([{ timestamp: 0, level: 0, args: ['bbb'], context: undefined }], nextMock);
+
+  expect(nextMock).not.toHaveBeenCalled();
+
+  logger.flush();
+
+  expect(nextMock).toHaveBeenCalledTimes(1);
+  expect(nextMock).toHaveBeenNthCalledWith(1, [
+    { timestamp: 0, level: 0, args: ['aaa'], context: undefined },
+    { timestamp: 0, level: 0, args: ['bbb'], context: undefined },
   ]);
 });

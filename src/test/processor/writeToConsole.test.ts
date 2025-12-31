@@ -1,49 +1,50 @@
 import { afterEach, expect, test, vi } from 'vitest';
-import { Level, LogMessage } from '../../main/index.js';
+import { Level, Logger, type LogMessage } from '../../main/index.js';
 import writeToConsole from '../../main/processor/writeToConsole.js';
 
-const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-const traceSpy = vi.spyOn(console, 'trace').mockImplementation(() => undefined);
-const debugSpy = vi.spyOn(console, 'debug').mockImplementation(() => undefined);
-const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
-const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+const consoleTraceSpy = vi.spyOn(console, 'trace').mockImplementation(() => undefined);
+const consoleDebugSpy = vi.spyOn(console, 'debug').mockImplementation(() => undefined);
+const consoleInfoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
 
 afterEach(() => {
-  errorSpy.mockReset();
-  warnSpy.mockReset();
-  traceSpy.mockReset();
-  debugSpy.mockReset();
-  infoSpy.mockReset();
-  logSpy.mockReset();
+  consoleErrorSpy.mockReset();
+  consoleWarnSpy.mockReset();
+  consoleTraceSpy.mockReset();
+  consoleDebugSpy.mockReset();
+  consoleInfoSpy.mockReset();
+  consoleLogSpy.mockReset();
 });
 
 test('calls console methods', () => {
   const nextMock = vi.fn();
+
   const messages: LogMessage[] = [
-    { level: Level.TRACE, args: ['aaa_trace'], context: undefined },
-    { level: Level.DEBUG, args: ['aaa_debug'], context: undefined },
-    { level: Level.INFO, args: ['aaa_info'], context: undefined },
-    { level: Level.WARN, args: ['aaa_warn'], context: undefined },
-    { level: Level.ERROR, args: ['aaa_error'], context: undefined },
-    { level: Level.FATAL, args: ['aaa_fatal'], context: undefined },
+    { timestamp: 0, level: Level.TRACE, args: ['aaa_trace'], context: undefined },
+    { timestamp: 0, level: Level.DEBUG, args: ['aaa_debug'], context: undefined },
+    { timestamp: 0, level: Level.INFO, args: ['aaa_info'], context: undefined },
+    { timestamp: 0, level: Level.WARN, args: ['aaa_warn'], context: undefined },
+    { timestamp: 0, level: Level.ERROR, args: ['aaa_error'], context: undefined },
+    { timestamp: 0, level: Level.FATAL, args: ['aaa_fatal'], context: undefined },
   ];
 
-  writeToConsole()(messages, nextMock);
+  writeToConsole()(new Logger())(messages, nextMock);
 
   expect(nextMock).toHaveBeenCalledTimes(1);
   expect(nextMock).toHaveBeenNthCalledWith(1, messages);
-  expect(errorSpy).toHaveBeenCalledTimes(2);
-  expect(errorSpy).toHaveBeenNthCalledWith(1, 'aaa_error');
-  expect(errorSpy).toHaveBeenNthCalledWith(2, 'aaa_fatal');
-  expect(warnSpy).toHaveBeenCalledTimes(1);
-  expect(warnSpy).toHaveBeenNthCalledWith(1, 'aaa_warn');
-  expect(traceSpy).toHaveBeenCalledTimes(1);
-  expect(traceSpy).toHaveBeenNthCalledWith(1, 'aaa_trace');
-  expect(debugSpy).toHaveBeenCalledTimes(1);
-  expect(debugSpy).toHaveBeenNthCalledWith(1, 'aaa_debug');
-  expect(infoSpy).toHaveBeenCalledTimes(1);
-  expect(infoSpy).toHaveBeenNthCalledWith(1, 'aaa_info');
+  expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+  expect(consoleErrorSpy).toHaveBeenNthCalledWith(1, 'aaa_error');
+  expect(consoleErrorSpy).toHaveBeenNthCalledWith(2, 'aaa_fatal');
+  expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
+  expect(consoleWarnSpy).toHaveBeenNthCalledWith(1, 'aaa_warn');
+  expect(consoleTraceSpy).toHaveBeenCalledTimes(1);
+  expect(consoleTraceSpy).toHaveBeenNthCalledWith(1, 'aaa_trace');
+  expect(consoleDebugSpy).toHaveBeenCalledTimes(1);
+  expect(consoleDebugSpy).toHaveBeenNthCalledWith(1, 'aaa_debug');
+  expect(consoleInfoSpy).toHaveBeenCalledTimes(1);
+  expect(consoleInfoSpy).toHaveBeenNthCalledWith(1, 'aaa_info');
 
-  expect(logSpy).not.toHaveBeenCalled();
+  expect(consoleLogSpy).not.toHaveBeenCalled();
 });
