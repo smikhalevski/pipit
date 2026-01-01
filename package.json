@@ -9,11 +9,12 @@
     ".": "./index.js",
     "./preprocessor/batchMessages": "./preprocessor/batchMessages.js",
     "./preprocessor/levelCutoff": "./preprocessor/levelCutoff.js",
-    "./preprocessor/prepend": "./preprocessor/prepend.js",
-    "./preprocessor/prependDateTime": "./preprocessor/prependDateTime.js",
+    "./preprocessor/prependArgs": "./preprocessor/prependArgs.js",
     "./preprocessor/prependLevel": "./preprocessor/prependLevel.js",
-    "./preprocessor/printToConsole": "./preprocessor/printToConsole.js",
+    "./preprocessor/prependTimestamp": "./preprocessor/prependTimestamp.js",
     "./preprocessor/sendToSentry": "./preprocessor/sendToSentry.js",
+    "./preprocessor/stringifyJSON": "./preprocessor/stringifyJSON.js",
+    "./preprocessor/writeToConsole": "./preprocessor/writeToConsole.js",
     "./package.json": "./package.json"
   },
   "sideEffects": false,
@@ -21,6 +22,7 @@
     "build": "tsc --project tsconfig.build.json && cp package.json README.md LICENSE.txt lib/ && cd lib && npm pkg delete scripts devDependencies",
     "clean": "rimraf lib docs coverage",
     "test": "vitest run",
+    "typecheck": "tsc",
     "docs": "typedoc"
   },
   "repository": {
@@ -37,11 +39,14 @@
   },
   "homepage": "https://github.com/smikhalevski/tag-soup#readme",
   "devDependencies": {
-    "prettier": "^3.6.2",
-    "rimraf": "^6.1.0",
+    "prettier": "^3.7.4",
+    "rimraf": "^6.1.2",
     "tslib": "^2.8.1",
-    "typedoc": "^0.28.14",
+    "typedoc": "^0.28.15",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.10"
+    "vitest": "^4.0.16"
+  },
+  "dependencies": {
+    "parallel-universe": "^6.1.2"
   }
 }

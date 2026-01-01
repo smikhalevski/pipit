@@ -20,11 +20,12 @@ npm install --save-prod pipit
 
 - [`batchMessages`](#batchmessages)
 - [`levelCutoff`](#levelcutoff)
-- [`prepend`](#prepend)
-- [`prependDateTime`](#prependdatetime)
+- [`prependArgs`](#prependargs)
 - [`prependLevel`](#prependlevel)
-- [`printToConsole`](#printtoconsole)
+- [`prependTimestamp`](#prependtimestamp)
 - [`sendToSentry`](#sendtosentry)
+- [`stringifyJSON`](#stringifyjson)
+- [`writeToConsole`](#writetoconsole)
 
 # Usage
 
@@ -43,12 +44,13 @@ send a push notification.
 Let's create a new logger and configure it:
 
 ```ts
-import { Logger, printToConsole } from 'pipit';
+import { Logger } from 'pipit';
+import writeToConsole from 'pipit/processor/writeToConsole';
 
 const myLogger = new Logger();
 
 // Open a channel that prints a message to the console
-myLogger.openChannel().to(printToConsole());
+myLogger.addChannel(writeToConsole());
 
 myLogger.log('Oh, snap!');
 ```
@@ -75,10 +77,10 @@ myLogger.trace('A finer-grained informational message than debug, usually with a
 By default, `Logger` sends all messages to channels, but you can set a minimum required level of the message severity:
 
 ```ts
-import { Logger, LogLevel } from 'pipit';
+import { Logger, Level } from 'pipit';
 
 // Log messages that have an error severity level or higher
-const myLogger = new Logger(LogLevel.ERROR);
+const myLogger = new Logger(Level.ERROR);
 
 // This message is ignored
 myLogger.debug('Hello there');
@@ -92,14 +94,16 @@ myLogger.fatal('Damn!');
 You can open as many channels on a single logger as you need:
 
 ```ts
-import { levelCutoff, Logger, LogLevel, printToConsole } from 'pipit';
+import { Logger, Level } from 'pipit';
 import sendToSentry from 'src/main/plugin/sentry';
+import levelCutoff from 'pipit/processor/levelCutoff';
+import writeToConsole from 'pipit/processor/writeToConsole';
 
 const myLogger = new Logger();
 
-myLogger.openChannel().to(printToConsole());
+myLogger.addChannel(writeToConsole());
 
-myLogger.openChannel().to(levelCutoff(LogLevel.ERROR)).to(sendToSentry());
+myLogger.addChannel(levelCutoff(Level.ERROR), sendToSentry());
 
 myLogger.log('Good job');
 
@@ -117,13 +121,13 @@ import logger from 'pipit';
 import sendToSentry from 'pipit/processor/sendToSentry';
 
 // Send all messages to Sentry
-logger.reset().openChannel().to(sendToSentry());
+logger.reset().addChannel(sendToSentry());
 ```
 
 You can also reset the logging level:
 
 ```ts
-logger.reset(LogLevel.WARN);
+logger.reset(Level.WARN);
 ```
 
 ## Processors
@@ -135,22 +139,22 @@ in the channel.
 To showcase how processors work, let's create a basic processor that prepends a timestamp to each logged message:
 
 ```ts
-import { Logger, printToConsole } from 'pipit';
+import { Logger, LogProcessor } from 'pipit';
+import writeToConsole from 'pipit/processor/writeToConsole';
+
+const myLogProcessor: LogProcessor = logger => (messages, next) => {
+  const date = new Date().toISOString();
+
+  for (const message of messages) {
+    message.args.unshift(date);
+  }
+
+  next(messages);
+};
 
 const myLogger = new Logger();
 
-myLogger
-  .openChannel()
-  .to((messages, next) => {
-    const date = new Date().toISOString();
-
-    for (const message of messages) {
-      message.args.unshift(date);
-    }
-
-    next(messages);
-  })
-  .to(printToConsole());
+myLogger.addChannel(myLogProcessor, writeToConsole());
 
 myLogger.log('Okay, cowboy');
 // ⮕ '2022-11-25T16:59:44.286Z Okay, cowboy'
@@ -162,7 +166,7 @@ You can use a logger or a channel as a processor:
 const myLogger1 = new Logger();
 const myLogger2 = new Logger();
 
-myLogger1.openChannel().to(myLogger2);
+myLogger1.addChannel(myLogger2);
 ```
 
 # `batchMessages`
@@ -171,11 +175,9 @@ Batches messages using a timeout and/or limit strategy.
 
 ```ts
 import batchMessages from 'pipit/processor/batchMessages';
+import writeToConsole from 'pipit/processor/writeToConsole';
 
-myLogger
-  .openChannel()
-  .to(batchMessages({ timeout: 1_000, limit: 2 }))
-  .to(printToConsole());
+myLogger.addChannel(batchMessages({ timeout: 1_000, limit: 2 }), writeToConsole());
 
 myLogger.log('No way');
 // Does nothing, since not enough messages to dispatch
@@ -194,11 +196,11 @@ processor.
 Excludes messages that have an insufficient severity level.
 
 ```ts
-import { LogLevel } from 'pipit';
+import { Level } from 'pipit';
 import levelCutoff from 'pipit/processor/levelCutoff';
-import printToConsole from 'pipit/processor/printToConsole';
+import writeToConsole from 'pipit/processor/writeToConsole';
 
-myLogger.openChannel().to(levelCutoff(LogLevel.WARN)).to(printToConsole());
+myLogger.addChannel(levelCutoff(Level.WARN), writeToConsole());
 
 myLogger.info('Something happened');
 // Does nothing, since level of this message is INFO
@@ -210,32 +212,18 @@ myLogger.fatal('The base is under attack');
 This processor comes handy if you have multiple channels in your logger and want some of them to be used only if message
 is severe enough.
 
-# `prepend`
+# `prependArgs`
 
 Prepends a set args to each message.
 
 ```ts
-import prepend from 'pipit/processor/prepend';
-import printToConsole from 'pipit/processor/printToConsole';
+import prependArgs from 'pipit/processor/prependArgs';
+import writeToConsole from 'pipit/processor/writeToConsole';
 
-myLogger.openChannel().to(prepend('Hello,')).to(printToConsole());
+myLogger.addChannel(prependArgs('Hello,'), writeToConsole());
 
 myLogger.log('Boss');
 // ⮕ 'Hello, Boss'
-```
-
-# `prependDateTime`
-
-Prepends date and time in ISO format to each message.
-
-```ts
-import prependDateTime from 'pipit/processor/prependDateTime';
-import printToConsole from 'pipit/processor/printToConsole';
-
-myLogger.openChannel().to(prependDateTime()).to(printToConsole());
-
-myLogger.log('Okay, cowboy');
-// ⮕ '2022-11-25T16:59:44.286Z Okay, cowboy'
 ```
 
 # `prependLevel`
@@ -244,25 +232,26 @@ Prepends severity level label to each message.
 
 ```ts
 import prependLevel from 'pipit/processor/prependLevel';
-import printToConsole from 'pipit/processor/printToConsole';
+import writeToConsole from 'pipit/processor/writeToConsole';
 
-myLogger.openChannel().to(prependLevel()).to(printToConsole());
+myLogger.addChannel(prependLevel(), writeToConsole());
 
 myLogger.fatal('No way!');
 // ⮕ 'FATAL No way
 ```
 
-# `printToConsole`
+# `prependTimestamp`
 
-Prints messages to the console.
+Prepends date and time in ISO format to each message.
 
 ```ts
-import printToConsole from 'pipit/processor/printToConsole';
+import prependTimestamp from 'pipit/processor/prependTimestamp';
+import writeToConsole from 'pipit/processor/writeToConsole';
 
-myLogger.openChannel().to(printToConsole());
+myLogger.addChannel(prependTimestamp(), writeToConsole());
 
-myLogger.log('Okay');
-// ⮕ 'Okay'
+myLogger.log('Okay, cowboy');
+// ⮕ '2022-11-25T16:59:44.286Z Okay, cowboy'
 ```
 
 # `sendToSentry`
@@ -274,8 +263,36 @@ import logger from 'pipit';
 import sendToSentry from 'pipit/processor/sendToSentry';
 import * as Sentry from '@sentry/browser';
 
-logger.openChannel().to(sendToSentry(Sentry));
+logger.addChannel(sendToSentry(Sentry));
 
 logger.log('To the moon!');
 // Prints message to console and sends it to Sentry
+```
+
+# `stringifyJSON`
+
+Squashes message arguments into an object.
+
+```ts
+import logger from 'pipit';
+import stringifyJSON from 'pipit/processor/stringifyJSON';
+import * as Sentry from '@sentry/browser';
+
+logger.addChannel(stringifyJSON());
+
+logger.log('To the moon!');
+// {"timestamp":1767277876893,"level":"info","message":"To the moon!"}
+```
+
+# `writeToConsole`
+
+Prints messages to the console.
+
+```ts
+import writeToConsole from 'pipit/processor/writeToConsole';
+
+myLogger.addChannel(writeToConsole());
+
+myLogger.log('Okay');
+// ⮕ 'Okay'
 ```

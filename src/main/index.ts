@@ -1,17 +1,15 @@
 import { Logger } from './Logger.js';
-import printToConsole from './processor/printToConsole.js';
+import writeToConsole from './processor/writeToConsole.js';
 
-export * from './LogLevel.js';
-export * from './Logger.js';
-export * from './LoggerChannel.js';
+export { Level } from './Level.js';
+export { Logger } from './Logger.js';
+export type { LoggerEvent, LogMessage, LogMessagesHandler, LogProcessor } from './types.js';
+
+const logger = new Logger().addChannel(writeToConsole());
 
 /**
  * The default global logger.
  *
- * By default, prints all messages to console.
+ * By default, writes all messages to console.
  */
-const logger = new Logger();
-
-logger.openChannel().to(printToConsole());
-
 export default logger;
