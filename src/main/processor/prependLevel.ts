@@ -2,7 +2,15 @@ import { Level } from '../Level.js';
 import type { LogProcessor } from '../types.js';
 import { bgBlue, bgRed, bgYellow, black, dim, inverse, white } from '../utils.js';
 
+/**
+ * Options passed to {@link prependLevel}.
+ */
 export interface PrependLevelOptions {
+  /**
+   * If `true` then level is colorized.
+   *
+   * @default false
+   */
   isColorized?: boolean;
 }
 

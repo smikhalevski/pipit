@@ -1,6 +1,6 @@
 {
   "name": "pipit",
-  "version": "2.0.0",
+  "version": "1.0.1",
   "description": "The universal logger with the pluggable architecture.",
   "type": "module",
   "main": "./index.js",
@@ -13,7 +13,9 @@
     "./preprocessor/prependLevel": "./preprocessor/prependLevel.js",
     "./preprocessor/prependTimestamp": "./preprocessor/prependTimestamp.js",
     "./preprocessor/sendToSentry": "./preprocessor/sendToSentry.js",
-    "./preprocessor/stringifyJSON": "./preprocessor/stringifyJSON.js",
+    "./preprocessor/stringifyAsJSON": "./preprocessor/stringifyAsJSON.js",
+    "./preprocessor/structurizeArgs": "./preprocessor/structurizeArgs.js",
+    "./preprocessor/transformArgs": "./preprocessor/transformArgs.js",
     "./preprocessor/writeToConsole": "./preprocessor/writeToConsole.js",
     "./package.json": "./package.json"
   },
@@ -27,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/smikhalevski/tag-soup.git"
+    "url": "git+https://github.com/smikhalevski/pipit.git"
   },
   "keywords": [
     "logger"
@@ -35,16 +37,17 @@
   "author": "Savva Mikhalevski <smikhalevski@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/smikhalevski/tag-soup/issues"
+    "url": "https://github.com/smikhalevski/pipit/issues"
   },
-  "homepage": "https://github.com/smikhalevski/tag-soup#readme",
+  "homepage": "https://github.com/smikhalevski/pipit#readme",
   "devDependencies": {
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.1",
     "rimraf": "^6.1.2",
     "tslib": "^2.8.1",
-    "typedoc": "^0.28.15",
+    "typedoc": "^0.28.16",
+    "typedoc-plugin-mdn-links": "^5.1.1",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.16"
+    "vitest": "^4.0.18"
   },
   "dependencies": {
     "parallel-universe": "^6.1.2"

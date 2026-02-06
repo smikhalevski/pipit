@@ -4,15 +4,21 @@ import type { LoggerEvent, LogMessage, LogMessagesHandler, LogProcessor } from '
 
 /**
  * Dispatches logged messages to channels.
+ *
+ * @template Args Arguments of logging methods of the {@link Logger}.
+ * @template Context The context that is added to logged messages.
  */
-export class Logger<Args extends any[] = any[], Context = any> {
+export class Logger<
+  Args extends readonly any[] = any[],
+  Context extends object | undefined = Record<string, unknown> | undefined,
+> {
   /**
    * The minimum log level of messages that would be dispatched to channels.
    */
   level: number;
 
   /**
-   * The context that is added to dispatched messages.
+   * The context that is added to logged messages.
    */
   context: Context;
 
@@ -21,13 +27,15 @@ export class Logger<Args extends any[] = any[], Context = any> {
    */
   protected _channels: Array<(messages: LogMessage[]) => void> = [];
 
+  /**
+   * The logger event bus.
+   */
   protected _pubSub = new PubSub<LoggerEvent>();
 
   /**
    * Creates the new {@link Logger} instance.
    *
    * @param level The minimum log level of messages that would be dispatched to channels.
-   *
    */
   constructor(level?: number);
 
@@ -44,26 +52,44 @@ export class Logger<Args extends any[] = any[], Context = any> {
     this.context = context;
   }
 
+  /**
+   * `true` if {@link trace} messages are logged.
+   */
   get isTraceEnabled(): boolean {
     return this.level <= Level.TRACE;
   }
 
+  /**
+   * `true` if {@link debug} messages are logged.
+   */
   get isDebugEnabled(): boolean {
     return this.level <= Level.DEBUG;
   }
 
+  /**
+   * `true` if {@link info} messages are logged.
+   */
   get isInfoEnabled(): boolean {
     return this.level <= Level.INFO;
   }
 
+  /**
+   * `true` if {@link warn} messages are logged.
+   */
   get isWarnEnabled(): boolean {
     return this.level <= Level.WARN;
   }
 
+  /**
+   * `true` if {@link error} messages are logged.
+   */
   get isErrorEnabled(): boolean {
     return this.level <= Level.ERROR;
   }
 
+  /**
+   * `true` if {@link fatal} messages are logged.
+   */
   get isFatalEnabled(): boolean {
     return this.level <= Level.FATAL;
   }
@@ -73,7 +99,7 @@ export class Logger<Args extends any[] = any[], Context = any> {
    */
   trace = (...args: Args): void => {
     if (this.isTraceEnabled) {
-      dispatch(this._channels, Level.TRACE, args, this.context);
+      this._dispatch(Level.TRACE, args, this.context);
     }
   };
 
@@ -82,7 +108,7 @@ export class Logger<Args extends any[] = any[], Context = any> {
    */
   debug = (...args: Args): void => {
     if (this.isDebugEnabled) {
-      dispatch(this._channels, Level.DEBUG, args, this.context);
+      this._dispatch(Level.DEBUG, args, this.context);
     }
   };
 
@@ -91,7 +117,7 @@ export class Logger<Args extends any[] = any[], Context = any> {
    */
   info = (...args: Args): void => {
     if (this.isInfoEnabled) {
-      dispatch(this._channels, Level.INFO, args, this.context);
+      this._dispatch(Level.INFO, args, this.context);
     }
   };
 
@@ -100,7 +126,7 @@ export class Logger<Args extends any[] = any[], Context = any> {
    */
   warn = (...args: Args): void => {
     if (this.isWarnEnabled) {
-      dispatch(this._channels, Level.WARN, args, this.context);
+      this._dispatch(Level.WARN, args, this.context);
     }
   };
 
@@ -109,7 +135,7 @@ export class Logger<Args extends any[] = any[], Context = any> {
    */
   error = (...args: Args): void => {
     if (this.isErrorEnabled) {
-      dispatch(this._channels, Level.ERROR, args, this.context);
+      this._dispatch(Level.ERROR, args, this.context);
     }
   };
 
@@ -118,7 +144,7 @@ export class Logger<Args extends any[] = any[], Context = any> {
    */
   fatal = (...args: Args): void => {
     if (this.isFatalEnabled) {
-      dispatch(this._channels, Level.FATAL, args, this.context);
+      this._dispatch(Level.FATAL, args, this.context);
     }
   };
 
@@ -132,10 +158,12 @@ export class Logger<Args extends any[] = any[], Context = any> {
   /**
    * Removes all channels, unsubscribes all subscribers, and resets the log level.
    *
-   * @param level The new log level.
-   * @param context
+   * @param level The minimum log level of messages that would be dispatched to channels.
+   * @param context The context that is added to dispatched messages.
    */
   reset(level = this.level, context = this.context): this {
+    this.publish({ type: 'reset' });
+
     this.level = level;
     this.context = context;
 
@@ -178,21 +206,46 @@ export class Logger<Args extends any[] = any[], Context = any> {
     this.publish({ type: 'flush' });
   }
 
+  /**
+   * Subscribes to events published by the logger.
+   *
+   * @param listener The listener callback that is invoked when an event is published.
+   * @returns The callback that unsubscribes the listener.
+   */
   subscribe(listener: (event: LoggerEvent) => void): () => void {
     return this._pubSub.subscribe(listener);
   }
 
+  /**
+   * Publishes an event to subscribers of this logger.
+   *
+   * @param event The published event.
+   */
   publish(event: LoggerEvent): void {
     this._pubSub.publish(event);
   }
-}
 
-function dispatch(channels: Array<(messages: LogMessage[]) => void>, level: number, args: any[], context: any): void {
-  for (const channel of channels) {
-    try {
-      channel([{ timestamp: Date.now(), level, args, context }]);
-    } catch (error) {
-      setTimeout(die, 0, error);
+  /**
+   * Dispatches message to channels.
+   *
+   * @param level The message level.
+   * @param args The message arguments.
+   * @param context The message context.
+   */
+  protected _dispatch(level: number, args: readonly any[], context: any): void {
+    for (const channel of this._channels) {
+      try {
+        channel([
+          {
+            timestamp: Date.now(),
+            level,
+            args: args.slice(0),
+            context: context !== undefined ? structuredClone(context) : undefined,
+          },
+        ]);
+      } catch (error) {
+        setTimeout(die, 0, error);
+      }
     }
   }
 }

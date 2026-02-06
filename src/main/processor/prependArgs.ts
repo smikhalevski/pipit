@@ -3,7 +3,7 @@ import type { LogProcessor } from '../types.js';
 /**
  * Prepends args to each message and passes them to the next processor.
  *
- * @param args The args to prependArgs.
+ * @param args The args to prepend.
  * @returns The processor callback.
  */
 export default function prependArgs(...args: readonly any[]): LogProcessor {

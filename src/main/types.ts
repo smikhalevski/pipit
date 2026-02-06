@@ -7,7 +7,12 @@ export interface LoggerEvent {
   /**
    * The event type.
    */
-  type: string;
+  type: 'flush' | 'reset' | (string & {});
+
+  /**
+   * The optional event payload.
+   */
+  payload?: any;
 }
 
 /**

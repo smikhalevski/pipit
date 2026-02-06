@@ -1,3 +1,12 @@
+/**
+ * The module with the core Pipit functionality.
+ *
+ * ```ts
+ * import logger from 'pipit';
+ * ```
+ *
+ * @module pipit
+ */
 import { Logger } from './Logger.js';
 import writeToConsole from './processor/writeToConsole.js';
 

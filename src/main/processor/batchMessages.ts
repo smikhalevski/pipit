@@ -53,7 +53,7 @@ export default function batchMessages(options: BatchMessagesOptions = {}): LogPr
     };
 
     logger.subscribe(event => {
-      if (event.type === 'flush') {
+      if (event.type === 'flush' || event.type === 'reset') {
         flush();
       }
     });

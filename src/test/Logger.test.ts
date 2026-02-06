@@ -156,7 +156,7 @@ test('attaches logger context', () => {
   const handlerMock = vi.fn();
   const logger = new Logger();
 
-  logger.context = 111;
+  logger.context = { ppp: 'qqq' };
 
   logger.addChannel(() => handlerMock);
 
@@ -165,7 +165,7 @@ test('attaches logger context', () => {
   expect(handlerMock).toHaveBeenCalledTimes(1);
   expect(handlerMock).toHaveBeenNthCalledWith(
     1,
-    [{ timestamp: 1767276073322, level: Level.INFO, args: ['aaa'], context: 111 }],
+    [{ timestamp: 1767276073322, level: Level.INFO, args: ['aaa'], context: { ppp: 'qqq' } }],
     expect.any(Function)
   );
 });

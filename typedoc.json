@@ -11,6 +11,7 @@
   "navigation": {
     "includeFolders": false
   },
-  "entryPoints": ["./src/main/index.ts"],
-  "intentionallyNotExported": ["SentryClient"]
+  "entryPoints": ["./src/main/index.ts", "./src/main/processor/*.ts"],
+  "intentionallyNotExported": ["SentryClient"],
+  "plugin": ["typedoc-plugin-mdn-links"]
 }
