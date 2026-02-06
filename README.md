@@ -20,21 +20,21 @@ npm install --save-prod pipit
 
 <span class="toc-icon">🧩&ensp;</span>**Built-in processors**
 
-- [batchMessages](#batchmessages)
-- [levelCutoff](#levelcutoff)
-- [prependArgs](#prependargs)
-- [prependLevel](#prependlevel)
-- [prependTimestamp](#prependtimestamp)
-- [sendToSentry](#sendtosentry)
-- [stringifyAsJSON](#stringifyasjson)
-- [structurizeArgs](#structurizeargs)
-- [transformArgs](#transformargs)
-- [writeToConsole](#writetoconsole)
+- [`batchMessages`](#batchmessages)
+- [`levelCutoff`](#levelcutoff)
+- [`prependArgs`](#prependargs)
+- [`prependLevel`](#prependlevel)
+- [`prependTimestamp`](#prependtimestamp)
+- [`sendToSentry`](#sendtosentry)
+- [`stringifyAsJSON`](#stringifyasjson)
+- [`structurizeArgs`](#structurizeargs)
+- [`transformArgs`](#transformargs)
+- [`writeToConsole`](#writetoconsole)
 
 <span class="toc-icon">🍪&ensp;</span>**Cookbook**
 
 - [Multi-channel structured logging](#multi-channel-structured-logging)
-- [Logging computation-intensive results](#logging-computation-intensive-results)
+- [Logging computation-intensive values](#logging-computation-intensive-values)
 
 # Usage
 
@@ -494,10 +494,10 @@ And messages with lower severity are written to console only:
 logger.info('Good job!');
 ```
 
-## Logging computation-intensive results
+## Logging computation-intensive values
 
-If you want to log a computation-intensive value (i.e., a value that requires significant processing before it can be
-logged), it is recommended to first check whether logging is enabled:
+If logging a value requires significant processing, it is recommended to first check whether the logger is set to the
+appropriate logging level:
 
 ```ts
 import logger from 'pipit';
