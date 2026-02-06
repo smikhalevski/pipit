@@ -1,6 +1,6 @@
 {
   "name": "pipit",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "The universal logger with the pluggable architecture.",
   "type": "module",
   "main": "./index.js",
