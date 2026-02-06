@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  publish:
+  publish-package:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -37,3 +37,7 @@ jobs:
         run: gh release create ${{ github.ref_name }} --generate-notes --draft
         env:
           GH_TOKEN: ${{ github.token }}
+
+  publish-docs:
+    needs: [publish-package]
+    uses: ./.github/workflows/publish-docs.yml
